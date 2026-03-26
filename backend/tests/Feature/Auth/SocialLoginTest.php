@@ -190,4 +190,40 @@ class SocialLoginTest extends TestCase
         $this->assertStringContainsString('error=email_required', $location);
         $this->assertDatabaseCount('users', 0);
     }
+
+    // ─── Task 9: Login guard for social-only users ───────────────────────────
+
+    public function test_social_only_user_cannot_login_with_password(): void
+    {
+        User::factory()->create([
+            'email'     => 'social@example.com',
+            'google_id' => 'google_555',
+            'password'  => null,
+        ]);
+
+        $response = $this->postJson('/api/auth/login', [
+            'email'    => 'social@example.com',
+            'password' => 'anypassword',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonFragment(['message' => 'บัญชีนี้ไม่มีรหัสผ่าน กรุณา login ด้วย Google หรือ Facebook']);
+    }
+
+    public function test_merged_user_can_still_login_with_password(): void
+    {
+        User::factory()->create([
+            'email'     => 'merged@example.com',
+            'google_id' => 'google_merged_111',
+            'password'  => 'secret123',
+        ]);
+
+        $response = $this->postJson('/api/auth/login', [
+            'email'    => 'merged@example.com',
+            'password' => 'secret123',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonStructure(['token']);
+    }
 }

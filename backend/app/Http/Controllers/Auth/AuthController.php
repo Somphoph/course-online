@@ -44,6 +44,12 @@ class AuthController extends Controller
 
         $user = User::where('email', $data['email'])->first();
 
+        if ($user && is_null($user->getRawOriginal('password'))) {
+            return response()->json([
+                'message' => 'บัญชีนี้ไม่มีรหัสผ่าน กรุณา login ด้วย Google หรือ Facebook',
+            ], 422);
+        }
+
         if (! $user || ! Hash::check($data['password'], $user->password)) {
             return response()->json(['message' => 'Invalid credentials.'], 422);
         }
