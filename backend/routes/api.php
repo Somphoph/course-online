@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\EnrollmentController as AdminEnrollmentController
 use App\Http\Controllers\Admin\LessonController as AdminLessonController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LessonVideoController;
@@ -16,6 +17,9 @@ Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
     Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
     Route::post('reset-password', [AuthController::class, 'resetPassword']);
+
+    Route::get('{provider}/redirect', [SocialAuthController::class, 'redirect']);
+    Route::get('{provider}/callback', [SocialAuthController::class, 'callback']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
