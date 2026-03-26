@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class IndexPackageEnrollmentRequest extends FormRequest
+class IndexBundleEnrollmentRequest extends FormRequest
 {
     public function authorize(): bool
     {

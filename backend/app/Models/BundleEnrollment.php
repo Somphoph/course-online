@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class PackageEnrollment extends Model
+class BundleEnrollment extends Model
 {
     use HasFactory;
+
+    protected $table = 'package_enrollments';
 
     protected $fillable = [
         'user_id',
@@ -33,9 +35,9 @@ class PackageEnrollment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function package(): BelongsTo
+    public function bundle(): BelongsTo
     {
-        return $this->belongsTo(Package::class);
+        return $this->belongsTo(Bundle::class, 'package_id');
     }
 
     public function approver(): BelongsTo
@@ -45,7 +47,7 @@ class PackageEnrollment extends Model
 
     public function payment(): HasOne
     {
-        return $this->hasOne(PackagePayment::class);
+        return $this->hasOne(BundlePayment::class, 'package_enrollment_id');
     }
 
     public function enrollments(): HasMany

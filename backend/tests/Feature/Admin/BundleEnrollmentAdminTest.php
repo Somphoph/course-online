@@ -4,40 +4,41 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Course;
 use App\Models\Enrollment;
-use App\Models\Package;
-use App\Models\PackageEnrollment;
-use App\Models\PackagePayment;
+use App\Models\Bundle;
+use App\Models\BundleEnrollment;
+use App\Models\BundlePayment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-class PackageEnrollmentAdminTest extends TestCase
+class BundleEnrollmentAdminTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createPackageEnrollmentWithPayment(array $overrides = []): PackageEnrollment
+    private function createBundleEnrollmentWithPayment(array $overrides = []): BundleEnrollment
     {
-        $packageEnrollment = PackageEnrollment::factory()->create($overrides);
+        $bundleEnrollment = BundleEnrollment::factory()->create($overrides);
+        $bundle = Bundle::findOrFail($bundleEnrollment->package_id);
 
-        PackagePayment::create([
-            'package_enrollment_id' => $packageEnrollment->id,
-            'user_id' => $packageEnrollment->user_id,
-            'package_id' => $packageEnrollment->package_id,
-            'amount' => Package::findOrFail($packageEnrollment->package_id)->price,
+        BundlePayment::create([
+            'package_enrollment_id' => $bundleEnrollment->id,
+            'user_id' => $bundleEnrollment->user_id,
+            'amount' => $bundle->price,
+            'package_id' => $bundleEnrollment->package_id,
             'currency' => 'THB',
             'provider' => 'manual',
             'status' => 'pending',
         ]);
 
-        return $packageEnrollment;
+        return $bundleEnrollment;
     }
 
-    public function test_admin_can_list_package_enrollments(): void
+    public function test_admin_can_list_bundle_enrollments(): void
     {
         $admin = User::factory()->admin()->create();
-        $this->createPackageEnrollmentWithPayment(['status' => 'pending']);
+        $this->createBundleEnrollmentWithPayment(['status' => 'pending']);
 
         Sanctum::actingAs($admin);
 
@@ -46,11 +47,11 @@ class PackageEnrollmentAdminTest extends TestCase
             ->assertJsonCount(1, 'data');
     }
 
-    public function test_admin_can_filter_package_enrollments_by_status(): void
+    public function test_admin_can_filter_bundle_enrollments_by_status(): void
     {
         $admin = User::factory()->admin()->create();
-        $this->createPackageEnrollmentWithPayment(['status' => 'pending']);
-        PackageEnrollment::factory()->approved()->create();
+        $this->createBundleEnrollmentWithPayment(['status' => 'pending']);
+        BundleEnrollment::factory()->approved()->create();
 
         Sanctum::actingAs($admin);
 
@@ -59,33 +60,33 @@ class PackageEnrollmentAdminTest extends TestCase
             ->assertJsonCount(1, 'data');
     }
 
-    public function test_admin_can_approve_package_enrollment_and_create_enrollments(): void
+    public function test_admin_can_approve_bundle_enrollment_and_create_enrollments(): void
     {
         $admin = User::factory()->admin()->create();
         $student = User::factory()->create();
-        $package = Package::factory()->create(['price' => 1500]);
+        $bundle = Bundle::factory()->create(['price' => 1500]);
         $course1 = Course::factory()->create();
         $course2 = Course::factory()->create();
-        $package->courses()->attach([$course1->id, $course2->id]);
+        $bundle->courses()->attach([$course1->id, $course2->id]);
 
-        $packageEnrollment = $this->createPackageEnrollmentWithPayment([
+        $bundleEnrollment = $this->createBundleEnrollmentWithPayment([
             'user_id' => $student->id,
-            'package_id' => $package->id,
+            'package_id' => $bundle->id,
             'status' => 'pending',
         ]);
 
         Sanctum::actingAs($admin);
 
-        $this->postJson("/api/admin/bundle-enrollments/{$packageEnrollment->id}/approve")
+        $this->postJson("/api/admin/bundle-enrollments/{$bundleEnrollment->id}/approve")
             ->assertOk();
 
         $this->assertDatabaseHas('package_enrollments', [
-            'id' => $packageEnrollment->id,
+            'id' => $bundleEnrollment->id,
             'status' => 'approved',
         ]);
 
         $this->assertDatabaseHas('package_payments', [
-            'package_enrollment_id' => $packageEnrollment->id,
+            'package_enrollment_id' => $bundleEnrollment->id,
             'status' => 'success',
         ]);
 
@@ -94,37 +95,37 @@ class PackageEnrollmentAdminTest extends TestCase
             'user_id' => $student->id,
             'course_id' => $course1->id,
             'status' => 'approved',
-            'package_enrollment_id' => $packageEnrollment->id,
+            'package_enrollment_id' => $bundleEnrollment->id,
         ]);
         $this->assertDatabaseHas('enrollments', [
             'user_id' => $student->id,
             'course_id' => $course2->id,
             'status' => 'approved',
-            'package_enrollment_id' => $packageEnrollment->id,
+            'package_enrollment_id' => $bundleEnrollment->id,
         ]);
     }
 
-    public function test_approve_allows_duplicate_course_enrollments_from_package(): void
+    public function test_approve_allows_duplicate_course_enrollments_from_bundle(): void
     {
         $admin = User::factory()->admin()->create();
         $student = User::factory()->create();
-        $package = Package::factory()->create();
+        $bundle = Bundle::factory()->create();
         $course = Course::factory()->create();
-        $package->courses()->attach($course->id);
+        $bundle->courses()->attach($course->id);
 
         Enrollment::factory()->approved()->create([
             'user_id' => $student->id,
             'course_id' => $course->id,
         ]);
 
-        $packageEnrollment = $this->createPackageEnrollmentWithPayment([
+        $bundleEnrollment = $this->createBundleEnrollmentWithPayment([
             'user_id' => $student->id,
-            'package_id' => $package->id,
+            'package_id' => $bundle->id,
         ]);
 
         Sanctum::actingAs($admin);
 
-        $this->postJson("/api/admin/bundle-enrollments/{$packageEnrollment->id}/approve")
+        $this->postJson("/api/admin/bundle-enrollments/{$bundleEnrollment->id}/approve")
             ->assertOk();
 
         $this->assertSame(2, Enrollment::query()
@@ -133,23 +134,23 @@ class PackageEnrollmentAdminTest extends TestCase
             ->count());
     }
 
-    public function test_admin_can_reject_package_enrollment(): void
+    public function test_admin_can_reject_bundle_enrollment(): void
     {
         $admin = User::factory()->admin()->create();
-        $packageEnrollment = $this->createPackageEnrollmentWithPayment(['status' => 'pending']);
+        $bundleEnrollment = $this->createBundleEnrollmentWithPayment(['status' => 'pending']);
 
         Sanctum::actingAs($admin);
 
-        $this->postJson("/api/admin/bundle-enrollments/{$packageEnrollment->id}/reject")
+        $this->postJson("/api/admin/bundle-enrollments/{$bundleEnrollment->id}/reject")
             ->assertOk();
 
         $this->assertDatabaseHas('package_enrollments', [
-            'id' => $packageEnrollment->id,
+            'id' => $bundleEnrollment->id,
             'status' => 'rejected',
         ]);
 
         $this->assertDatabaseHas('package_payments', [
-            'package_enrollment_id' => $packageEnrollment->id,
+            'package_enrollment_id' => $bundleEnrollment->id,
             'status' => 'failed',
         ]);
 
@@ -162,17 +163,17 @@ class PackageEnrollmentAdminTest extends TestCase
         Storage::disk('local')->put('slips/test.jpg', 'fake-content');
 
         $admin = User::factory()->admin()->create();
-        $packageEnrollment = PackageEnrollment::factory()->create([
+        $bundleEnrollment = BundleEnrollment::factory()->create([
             'slip_image_path' => 'slips/test.jpg',
         ]);
 
         Sanctum::actingAs($admin);
 
-        $this->getJson("/api/admin/bundle-enrollments/{$packageEnrollment->id}/slip")
+        $this->getJson("/api/admin/bundle-enrollments/{$bundleEnrollment->id}/slip")
             ->assertOk();
     }
 
-    public function test_student_cannot_access_admin_package_enrollment_endpoints(): void
+    public function test_student_cannot_access_admin_bundle_enrollment_endpoints(): void
     {
         Sanctum::actingAs(User::factory()->create());
 

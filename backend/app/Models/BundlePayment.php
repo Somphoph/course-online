@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PackagePayment extends Model
+class BundlePayment extends Model
 {
     use HasFactory;
+
+    protected $table = 'package_payments';
 
     protected $fillable = [
         'package_enrollment_id',
@@ -28,9 +30,9 @@ class PackagePayment extends Model
         ];
     }
 
-    public function packageEnrollment(): BelongsTo
+    public function bundleEnrollment(): BelongsTo
     {
-        return $this->belongsTo(PackageEnrollment::class);
+        return $this->belongsTo(BundleEnrollment::class, 'package_enrollment_id');
     }
 
     public function user(): BelongsTo
@@ -38,8 +40,8 @@ class PackagePayment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function package(): BelongsTo
+    public function bundle(): BelongsTo
     {
-        return $this->belongsTo(Package::class);
+        return $this->belongsTo(Bundle::class, 'package_id');
     }
 }

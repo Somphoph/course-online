@@ -3,30 +3,30 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\AddPackageCourseRequest;
-use App\Http\Requests\Admin\StorePackageRequest;
-use App\Http\Requests\Admin\UpdatePackageRequest;
-use App\Http\Resources\PackageResource;
+use App\Http\Requests\Admin\AddBundleCourseRequest;
+use App\Http\Requests\Admin\StoreBundleRequest;
+use App\Http\Requests\Admin\UpdateBundleRequest;
+use App\Http\Resources\BundleResource;
 use App\Models\Course;
-use App\Models\Package;
+use App\Models\Bundle;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class PackageController extends Controller
+class BundleController extends Controller
 {
     public function index(): JsonResponse
     {
-        $packages = Package::query()
+        $bundles = Bundle::query()
             ->with('courses')
             ->latest()
             ->get();
 
         return response()->json([
-            'data' => PackageResource::collection($packages),
+            'data' => BundleResource::collection($bundles),
         ]);
     }
 
-    public function store(StorePackageRequest $request): JsonResponse
+    public function store(StoreBundleRequest $request): JsonResponse
     {
         $data = $request->validated();
 
@@ -36,33 +36,33 @@ class PackageController extends Controller
             ], 422);
         }
 
-        $package = Package::create($data);
+        $bundle = Bundle::create($data);
 
         return response()->json([
-            'data' => new PackageResource($package->load('courses')),
+            'data' => new BundleResource($bundle->load('courses')),
         ], 201);
     }
 
-    public function update(UpdatePackageRequest $request, Package $package): JsonResponse
+    public function update(UpdateBundleRequest $request, Bundle $bundle): JsonResponse
     {
         $data = $request->validated();
 
-        if (array_key_exists('is_published', $data) && $data['is_published'] && $package->courses()->count() === 0) {
+        if (array_key_exists('is_published', $data) && $data['is_published'] && $bundle->courses()->count() === 0) {
             return response()->json([
                 'message' => 'Bundle must have at least one course before publishing.',
             ], 422);
         }
 
-        $package->update($data);
+        $bundle->update($data);
 
         return response()->json([
-            'data' => new PackageResource($package->fresh()->load('courses')),
+            'data' => new BundleResource($bundle->fresh()->load('courses')),
         ]);
     }
 
-    public function destroy(Package $package): JsonResponse|Response
+    public function destroy(Bundle $bundle): JsonResponse|Response
     {
-        $hasActiveEnrollments = $package->packageEnrollments()
+        $hasActiveEnrollments = $bundle->bundleEnrollments()
             ->whereIn('status', ['pending', 'approved'])
             ->exists();
 
@@ -72,25 +72,25 @@ class PackageController extends Controller
             ], 422);
         }
 
-        $package->delete();
+        $bundle->delete();
 
         return response()->noContent();
     }
 
-    public function addCourse(AddPackageCourseRequest $request, Package $package): JsonResponse
+    public function addCourse(AddBundleCourseRequest $request, Bundle $bundle): JsonResponse
     {
         $data = $request->validated();
 
-        $package->courses()->syncWithoutDetaching([$data['course_id']]);
+        $bundle->courses()->syncWithoutDetaching([$data['course_id']]);
 
         return response()->json([
-            'data' => new PackageResource($package->fresh()->load('courses')),
+            'data' => new BundleResource($bundle->fresh()->load('courses')),
         ]);
     }
 
-    public function removeCourse(Package $package, Course $course): JsonResponse|Response
+    public function removeCourse(Bundle $bundle, Course $course): JsonResponse|Response
     {
-        $hasPendingEnrollments = $package->packageEnrollments()
+        $hasPendingEnrollments = $bundle->bundleEnrollments()
             ->where('status', 'pending')
             ->exists();
 
@@ -100,7 +100,7 @@ class PackageController extends Controller
             ], 422);
         }
 
-        $package->courses()->detach($course->id);
+        $bundle->courses()->detach($course->id);
 
         return response()->noContent();
     }

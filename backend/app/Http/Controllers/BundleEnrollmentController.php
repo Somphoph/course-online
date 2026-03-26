@@ -2,70 +2,70 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PurchasePackageRequest;
-use App\Http\Resources\PackageEnrollmentResource;
+use App\Http\Requests\PurchaseBundleRequest;
+use App\Http\Resources\BundleEnrollmentResource;
 use App\Models\Course;
-use App\Models\Package;
-use App\Models\PackageEnrollment;
-use App\Models\PackagePayment;
+use App\Models\Bundle;
+use App\Models\BundleEnrollment;
+use App\Models\BundlePayment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class PackageEnrollmentController extends Controller
+class BundleEnrollmentController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $packageEnrollments = PackageEnrollment::query()
-            ->with(['package.courses', 'user'])
+        $bundleEnrollments = BundleEnrollment::query()
+            ->with(['bundle.courses', 'user'])
             ->where('user_id', $request->user()->id)
             ->latest()
             ->get();
 
         return response()->json([
-            'data' => PackageEnrollmentResource::collection($packageEnrollments),
+            'data' => BundleEnrollmentResource::collection($bundleEnrollments),
         ]);
     }
 
-    public function store(PurchasePackageRequest $request, Package $package): JsonResponse
+    public function store(PurchaseBundleRequest $request, Bundle $bundle): JsonResponse
     {
-        abort_unless($package->is_published, 404);
+        abort_unless($bundle->is_published, 404);
 
-        $package->load('courses');
+        $bundle->load('courses');
 
         $alreadyEnrolledCourses = Course::query()
-            ->whereIn('id', $package->courses->pluck('id'))
+            ->whereIn('id', $bundle->courses->pluck('id'))
             ->whereHas('enrollments', function ($query) use ($request): void {
                 $query->where('user_id', $request->user()->id)
                     ->where('status', 'approved');
             })
             ->get();
 
-        $packageEnrollment = DB::transaction(function () use ($request, $package): PackageEnrollment {
+        $bundleEnrollment = DB::transaction(function () use ($request, $bundle): BundleEnrollment {
             $slipPath = $request->file('slip_image')->store('slips', 'local');
 
-            $packageEnrollment = PackageEnrollment::create([
+            $bundleEnrollment = BundleEnrollment::create([
                 'user_id' => $request->user()->id,
-                'package_id' => $package->id,
+                'package_id' => $bundle->id,
                 'status' => 'pending',
                 'slip_image_path' => $slipPath,
             ]);
 
-            PackagePayment::create([
-                'package_enrollment_id' => $packageEnrollment->id,
+            BundlePayment::create([
+                'package_enrollment_id' => $bundleEnrollment->id,
                 'user_id' => $request->user()->id,
-                'package_id' => $package->id,
-                'amount' => $package->price,
+                'package_id' => $bundle->id,
+                'amount' => $bundle->price,
                 'currency' => 'THB',
                 'provider' => 'manual',
                 'status' => 'pending',
             ]);
 
-            return $packageEnrollment;
+            return $bundleEnrollment;
         });
 
         return response()->json([
-            'package_enrollment' => new PackageEnrollmentResource($packageEnrollment->load(['package.courses', 'user'])),
+            'bundle_enrollment' => new BundleEnrollmentResource($bundleEnrollment->load(['bundle.courses', 'user'])),
             'already_enrolled_courses' => $alreadyEnrolledCourses->map(fn (Course $course): array => [
                 'id' => $course->id,
                 'title' => $course->title,

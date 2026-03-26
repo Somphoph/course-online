@@ -43,9 +43,9 @@ class Course extends Model
         return $this->hasMany(Enrollment::class);
     }
 
-    public function packages(): BelongsToMany
+    public function bundles(): BelongsToMany
     {
-        return $this->belongsToMany(Package::class, 'package_courses');
+        return $this->belongsToMany(Bundle::class, 'package_courses', 'course_id', 'package_id');
     }
 
 }

@@ -48,8 +48,8 @@ class Enrollment extends Model
         return $this->hasOne(Payment::class);
     }
 
-    public function packageEnrollment(): BelongsTo
+    public function bundleEnrollment(): BelongsTo
     {
-        return $this->belongsTo(PackageEnrollment::class);
+        return $this->belongsTo(BundleEnrollment::class, 'package_enrollment_id');
     }
 }

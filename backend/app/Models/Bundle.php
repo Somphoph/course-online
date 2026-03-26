@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Package extends Model
+class Bundle extends Model
 {
     use HasFactory;
+
+    protected $table = 'packages';
 
     protected $fillable = [
         'title',
@@ -35,11 +37,11 @@ class Package extends Model
 
     public function courses(): BelongsToMany
     {
-        return $this->belongsToMany(Course::class, 'package_courses');
+        return $this->belongsToMany(Course::class, 'package_courses', 'package_id', 'course_id');
     }
 
-    public function packageEnrollments(): HasMany
+    public function bundleEnrollments(): HasMany
     {
-        return $this->hasMany(PackageEnrollment::class);
+        return $this->hasMany(BundleEnrollment::class, 'package_id');
     }
 }

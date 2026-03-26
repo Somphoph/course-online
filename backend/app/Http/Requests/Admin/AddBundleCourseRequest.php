@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PurchasePackageRequest extends FormRequest
+class AddBundleCourseRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,7 +14,7 @@ class PurchasePackageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'slip_image' => ['required', 'image', 'max:2048'],
+            'course_id' => ['required', 'exists:courses,id'],
         ];
     }
 }

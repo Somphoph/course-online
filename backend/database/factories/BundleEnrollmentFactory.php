@@ -2,20 +2,20 @@
 
 namespace Database\Factories;
 
-use App\Models\Package;
+use App\Models\Bundle;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PackageEnrollment>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BundleEnrollment>
  */
-class PackageEnrollmentFactory extends Factory
+class BundleEnrollmentFactory extends Factory
 {
     public function definition(): array
     {
         return [
             'user_id' => User::factory(),
-            'package_id' => Package::factory(),
+            'package_id' => Bundle::factory(),
             'status' => 'pending',
             'slip_image_path' => null,
             'approved_at' => null,
