@@ -73,4 +73,29 @@ class SocialLoginTest extends TestCase
 
         $response->assertNotFound();
     }
+
+    public function test_new_google_user_is_created_and_redirected_with_token(): void
+    {
+        $this->mockSocialiteCallback('google', [
+            'id'    => 'google_abc123',
+            'email' => 'newuser@example.com',
+            'name'  => 'New User',
+        ]);
+
+        $response = $this->get('/api/auth/google/callback');
+
+        $response->assertRedirect();
+        $location = $response->headers->get('Location');
+        parse_str(parse_url($location, PHP_URL_QUERY), $params);
+        $this->assertArrayHasKey('token', $params);
+
+        $this->assertDatabaseHas('users', [
+            'email'     => 'newuser@example.com',
+            'google_id' => 'google_abc123',
+            'role'      => 'student',
+        ]);
+        $this->assertNull(
+            \DB::table('users')->where('email', 'newuser@example.com')->value('password')
+        );
+    }
 }
