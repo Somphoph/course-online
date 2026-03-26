@@ -78,6 +78,13 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
         ]);
 
+        $user = User::where('email', $data['email'])->first();
+        if ($user && is_null($user->getRawOriginal('password'))) {
+            return response()->json([
+                'message' => 'บัญชีนี้ไม่มีรหัสผ่าน กรุณา login ด้วย Google หรือ Facebook',
+            ], 422);
+        }
+
         $status = Password::sendResetLink($data);
 
         return response()->json(['status' => $status]);

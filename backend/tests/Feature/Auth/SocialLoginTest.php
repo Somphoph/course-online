@@ -174,6 +174,23 @@ class SocialLoginTest extends TestCase
         );
     }
 
+    // ─── OAuth cancellation ──────────────────────────────────────────────────
+
+    public function test_oauth_cancellation_redirects_with_error(): void
+    {
+        $providerMock = Mockery::mock(Provider::class);
+        $providerMock->shouldReceive('stateless')->andReturnSelf();
+        $providerMock->shouldReceive('user')->andThrow(new \Exception('Access denied'));
+
+        Socialite::shouldReceive('driver')->with('google')->andReturn($providerMock);
+
+        $response = $this->get('/api/auth/google/callback');
+
+        $response->assertRedirect();
+        $location = $response->headers->get('Location');
+        $this->assertStringContainsString('error=cancelled', $location);
+    }
+
     // ─── Task 8: Facebook missing email ──────────────────────────────────────
 
     public function test_facebook_login_without_email_redirects_with_error(): void
