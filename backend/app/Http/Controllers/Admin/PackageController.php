@@ -32,7 +32,7 @@ class PackageController extends Controller
 
         if (! empty($data['is_published'])) {
             return response()->json([
-                'message' => 'Package must have at least one course before publishing.',
+                'message' => 'Bundle must have at least one course before publishing.',
             ], 422);
         }
 
@@ -49,7 +49,7 @@ class PackageController extends Controller
 
         if (array_key_exists('is_published', $data) && $data['is_published'] && $package->courses()->count() === 0) {
             return response()->json([
-                'message' => 'Package must have at least one course before publishing.',
+                'message' => 'Bundle must have at least one course before publishing.',
             ], 422);
         }
 
@@ -68,7 +68,7 @@ class PackageController extends Controller
 
         if ($hasActiveEnrollments) {
             return response()->json([
-                'message' => 'Cannot delete package with active enrollments.',
+                'message' => 'Cannot delete bundle with active enrollments.',
             ], 422);
         }
 
@@ -96,7 +96,7 @@ class PackageController extends Controller
 
         if ($hasPendingEnrollments) {
             return response()->json([
-                'message' => 'Cannot remove course from package with pending enrollments.',
+                'message' => 'Cannot remove course from bundle with pending enrollments.',
             ], 422);
         }
 

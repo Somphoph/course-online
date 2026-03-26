@@ -54,7 +54,7 @@ class PackageEnrollmentController extends Controller
             }
         });
 
-        return response()->json(['message' => 'Package enrollment approved.']);
+        return response()->json(['message' => 'Bundle enrollment approved.']);
     }
 
     public function reject(PackageEnrollment $packageEnrollment): JsonResponse
@@ -64,7 +64,7 @@ class PackageEnrollmentController extends Controller
             $packageEnrollment->payment()->update(['status' => 'failed']);
         });
 
-        return response()->json(['message' => 'Package enrollment rejected.']);
+        return response()->json(['message' => 'Bundle enrollment rejected.']);
     }
 
     public function slip(PackageEnrollment $packageEnrollment): StreamedResponse

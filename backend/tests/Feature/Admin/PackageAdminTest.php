@@ -22,11 +22,11 @@ class PackageAdminTest extends TestCase
         Package::factory()->published()->create();
         $course = Course::factory()->create();
 
-        $this->getJson('/api/admin/packages')
+        $this->getJson('/api/admin/bundles')
             ->assertOk()
             ->assertJsonCount(1, 'data');
 
-        $createdResponse = $this->postJson('/api/admin/packages', [
+        $createdResponse = $this->postJson('/api/admin/bundles', [
             'title' => 'Admin package',
             'description' => 'Package description',
             'price' => 2500,
@@ -37,26 +37,26 @@ class PackageAdminTest extends TestCase
 
         $packageId = $createdResponse->json('data.id');
 
-        $this->putJson("/api/admin/packages/{$packageId}", [
+        $this->putJson("/api/admin/bundles/{$packageId}", [
             'title' => 'Updated package',
         ])
             ->assertOk()
             ->assertJsonPath('data.title', 'Updated package');
 
-        $this->postJson("/api/admin/packages/{$packageId}/courses", [
+        $this->postJson("/api/admin/bundles/{$packageId}/courses", [
             'course_id' => $course->id,
         ])->assertOk();
 
-        $this->putJson("/api/admin/packages/{$packageId}", [
+        $this->putJson("/api/admin/bundles/{$packageId}", [
             'is_published' => true,
         ])
             ->assertOk()
             ->assertJsonPath('data.is_published', true);
 
-        $this->deleteJson("/api/admin/packages/{$packageId}/courses/{$course->id}")
+        $this->deleteJson("/api/admin/bundles/{$packageId}/courses/{$course->id}")
             ->assertNoContent();
 
-        $this->deleteJson("/api/admin/packages/{$packageId}")
+        $this->deleteJson("/api/admin/bundles/{$packageId}")
             ->assertNoContent();
     }
 
@@ -67,7 +67,7 @@ class PackageAdminTest extends TestCase
 
         Sanctum::actingAs($admin);
 
-        $this->putJson("/api/admin/packages/{$package->id}", [
+        $this->putJson("/api/admin/bundles/{$package->id}", [
             'is_published' => true,
         ])->assertStatus(422);
     }
@@ -83,7 +83,7 @@ class PackageAdminTest extends TestCase
 
         Sanctum::actingAs($admin);
 
-        $this->deleteJson("/api/admin/packages/{$package->id}")
+        $this->deleteJson("/api/admin/bundles/{$package->id}")
             ->assertStatus(422);
     }
 
@@ -91,7 +91,7 @@ class PackageAdminTest extends TestCase
     {
         Sanctum::actingAs(User::factory()->create());
 
-        $this->getJson('/api/admin/packages')
+        $this->getJson('/api/admin/bundles')
             ->assertForbidden();
     }
 }

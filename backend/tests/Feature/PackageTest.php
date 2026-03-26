@@ -20,7 +20,7 @@ class PackageTest extends TestCase
 
         Package::factory()->create(['is_published' => false]);
 
-        $response = $this->getJson('/api/packages');
+        $response = $this->getJson('/api/bundles');
 
         $response->assertOk()
             ->assertJsonCount(1, 'data')
@@ -34,7 +34,7 @@ class PackageTest extends TestCase
     {
         $package = Package::factory()->create(['is_published' => false]);
 
-        $this->getJson("/api/packages/{$package->id}")
+        $this->getJson("/api/bundles/{$package->id}")
             ->assertNotFound();
     }
 
@@ -44,7 +44,7 @@ class PackageTest extends TestCase
         $course = Course::factory()->create(['price' => 1200]);
         $package->courses()->attach($course->id);
 
-        $this->getJson("/api/packages/{$package->id}")
+        $this->getJson("/api/bundles/{$package->id}")
             ->assertOk()
             ->assertJsonPath('data.id', $package->id)
             ->assertJsonPath('data.individual_total_price', 1200)

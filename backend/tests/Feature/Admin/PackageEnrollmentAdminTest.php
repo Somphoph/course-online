@@ -41,7 +41,7 @@ class PackageEnrollmentAdminTest extends TestCase
 
         Sanctum::actingAs($admin);
 
-        $this->getJson('/api/admin/package-enrollments')
+        $this->getJson('/api/admin/bundle-enrollments')
             ->assertOk()
             ->assertJsonCount(1, 'data');
     }
@@ -54,7 +54,7 @@ class PackageEnrollmentAdminTest extends TestCase
 
         Sanctum::actingAs($admin);
 
-        $this->getJson('/api/admin/package-enrollments?status=approved')
+        $this->getJson('/api/admin/bundle-enrollments?status=approved')
             ->assertOk()
             ->assertJsonCount(1, 'data');
     }
@@ -76,7 +76,7 @@ class PackageEnrollmentAdminTest extends TestCase
 
         Sanctum::actingAs($admin);
 
-        $this->postJson("/api/admin/package-enrollments/{$packageEnrollment->id}/approve")
+        $this->postJson("/api/admin/bundle-enrollments/{$packageEnrollment->id}/approve")
             ->assertOk();
 
         $this->assertDatabaseHas('package_enrollments', [
@@ -124,7 +124,7 @@ class PackageEnrollmentAdminTest extends TestCase
 
         Sanctum::actingAs($admin);
 
-        $this->postJson("/api/admin/package-enrollments/{$packageEnrollment->id}/approve")
+        $this->postJson("/api/admin/bundle-enrollments/{$packageEnrollment->id}/approve")
             ->assertOk();
 
         $this->assertSame(2, Enrollment::query()
@@ -140,7 +140,7 @@ class PackageEnrollmentAdminTest extends TestCase
 
         Sanctum::actingAs($admin);
 
-        $this->postJson("/api/admin/package-enrollments/{$packageEnrollment->id}/reject")
+        $this->postJson("/api/admin/bundle-enrollments/{$packageEnrollment->id}/reject")
             ->assertOk();
 
         $this->assertDatabaseHas('package_enrollments', [
@@ -168,7 +168,7 @@ class PackageEnrollmentAdminTest extends TestCase
 
         Sanctum::actingAs($admin);
 
-        $this->getJson("/api/admin/package-enrollments/{$packageEnrollment->id}/slip")
+        $this->getJson("/api/admin/bundle-enrollments/{$packageEnrollment->id}/slip")
             ->assertOk();
     }
 
@@ -176,7 +176,7 @@ class PackageEnrollmentAdminTest extends TestCase
     {
         Sanctum::actingAs(User::factory()->create());
 
-        $this->getJson('/api/admin/package-enrollments')
+        $this->getJson('/api/admin/bundle-enrollments')
             ->assertForbidden();
     }
 }

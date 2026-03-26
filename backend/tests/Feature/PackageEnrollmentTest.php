@@ -29,7 +29,7 @@ class PackageEnrollmentTest extends TestCase
 
         Sanctum::actingAs($student);
 
-        $response = $this->postJson("/api/packages/{$package->id}/purchase", [
+        $response = $this->postJson("/api/bundles/{$package->id}/purchase", [
             'slip_image' => UploadedFile::fake()->create('slip.jpg', 100, 'image/jpeg'),
         ]);
 
@@ -68,7 +68,7 @@ class PackageEnrollmentTest extends TestCase
 
         Sanctum::actingAs($student);
 
-        $response = $this->postJson("/api/packages/{$package->id}/purchase", [
+        $response = $this->postJson("/api/bundles/{$package->id}/purchase", [
             'slip_image' => UploadedFile::fake()->create('slip.jpg', 100, 'image/jpeg'),
         ]);
 
@@ -87,7 +87,7 @@ class PackageEnrollmentTest extends TestCase
 
         Sanctum::actingAs($student);
 
-        $this->postJson("/api/packages/{$package->id}/purchase", [
+        $this->postJson("/api/bundles/{$package->id}/purchase", [
             'slip_image' => UploadedFile::fake()->create('slip.jpg', 100, 'image/jpeg'),
         ])->assertNotFound();
     }
@@ -98,7 +98,7 @@ class PackageEnrollmentTest extends TestCase
 
         $package = Package::factory()->published()->create();
 
-        $this->postJson("/api/packages/{$package->id}/purchase", [
+        $this->postJson("/api/bundles/{$package->id}/purchase", [
             'slip_image' => UploadedFile::fake()->create('slip.jpg', 100, 'image/jpeg'),
         ])->assertUnauthorized();
     }
@@ -112,7 +112,7 @@ class PackageEnrollmentTest extends TestCase
 
         Sanctum::actingAs($student);
 
-        $this->getJson('/api/package-enrollments')
+        $this->getJson('/api/bundle-enrollments')
             ->assertOk()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', $packageEnrollment->id);

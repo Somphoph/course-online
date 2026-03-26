@@ -34,6 +34,8 @@ Route::prefix('auth')->group(function () {
 
 Route::get('courses', [CourseController::class, 'index']);
 Route::get('courses/{course:slug}', [CourseController::class, 'show']);
+Route::get('bundles', [PackageController::class, 'index']);
+Route::get('bundles/{package}', [PackageController::class, 'show']);
 Route::get('packages', [PackageController::class, 'index']);
 Route::get('packages/{package}', [PackageController::class, 'show']);
 
@@ -44,6 +46,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('enrollments', [EnrollmentController::class, 'index']);
     Route::post('enrollments', [EnrollmentController::class, 'store']);
+    Route::get('bundle-enrollments', [PackageEnrollmentController::class, 'index']);
+    Route::post('bundles/{package}/purchase', [PackageEnrollmentController::class, 'store']);
     Route::get('package-enrollments', [PackageEnrollmentController::class, 'index']);
     Route::post('packages/{package}/purchase', [PackageEnrollmentController::class, 'store']);
     Route::get('lessons/{lesson}/video-url', [LessonVideoController::class, 'show']);
@@ -61,6 +65,12 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::post('enrollments/{enrollment}/reject', [AdminEnrollmentController::class, 'reject']);
     Route::get('enrollments/{enrollment}/slip', [AdminEnrollmentController::class, 'slip']);
 
+    Route::get('bundles', [AdminPackageController::class, 'index']);
+    Route::post('bundles', [AdminPackageController::class, 'store']);
+    Route::put('bundles/{package}', [AdminPackageController::class, 'update']);
+    Route::delete('bundles/{package}', [AdminPackageController::class, 'destroy']);
+    Route::post('bundles/{package}/courses', [AdminPackageController::class, 'addCourse']);
+    Route::delete('bundles/{package}/courses/{course}', [AdminPackageController::class, 'removeCourse']);
     Route::get('packages', [AdminPackageController::class, 'index']);
     Route::post('packages', [AdminPackageController::class, 'store']);
     Route::put('packages/{package}', [AdminPackageController::class, 'update']);
@@ -68,6 +78,10 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::post('packages/{package}/courses', [AdminPackageController::class, 'addCourse']);
     Route::delete('packages/{package}/courses/{course}', [AdminPackageController::class, 'removeCourse']);
 
+    Route::get('bundle-enrollments', [AdminPackageEnrollmentController::class, 'index']);
+    Route::post('bundle-enrollments/{packageEnrollment}/approve', [AdminPackageEnrollmentController::class, 'approve']);
+    Route::post('bundle-enrollments/{packageEnrollment}/reject', [AdminPackageEnrollmentController::class, 'reject']);
+    Route::get('bundle-enrollments/{packageEnrollment}/slip', [AdminPackageEnrollmentController::class, 'slip']);
     Route::get('package-enrollments', [AdminPackageEnrollmentController::class, 'index']);
     Route::post('package-enrollments/{packageEnrollment}/approve', [AdminPackageEnrollmentController::class, 'approve']);
     Route::post('package-enrollments/{packageEnrollment}/reject', [AdminPackageEnrollmentController::class, 'reject']);
