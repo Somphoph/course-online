@@ -77,7 +77,7 @@ class BundleAdminTest extends TestCase
         $admin = User::factory()->admin()->create();
         $bundle = Bundle::factory()->published()->create();
         BundleEnrollment::factory()->create([
-            'package_id' => $bundle->id,
+            'bundle_id' => $bundle->id,
             'status' => 'pending',
         ]);
 

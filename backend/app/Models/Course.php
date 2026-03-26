@@ -45,7 +45,7 @@ class Course extends Model
 
     public function bundles(): BelongsToMany
     {
-        return $this->belongsToMany(Bundle::class, 'package_courses', 'course_id', 'package_id');
+        return $this->belongsToMany(Bundle::class, 'bundle_courses', 'course_id', 'bundle_id');
     }
 
 }

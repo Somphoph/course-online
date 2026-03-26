@@ -37,15 +37,15 @@ class BundleEnrollmentTest extends TestCase
             ->assertJsonPath('bundle_enrollment.status', 'pending')
             ->assertJsonCount(0, 'already_enrolled_courses');
 
-        $this->assertDatabaseHas('package_enrollments', [
+        $this->assertDatabaseHas('bundle_enrollments', [
             'user_id' => $student->id,
-            'package_id' => $bundle->id,
+            'bundle_id' => $bundle->id,
             'status' => 'pending',
         ]);
 
-        $this->assertDatabaseHas('package_payments', [
+        $this->assertDatabaseHas('bundle_payments', [
             'user_id' => $student->id,
-            'package_id' => $bundle->id,
+            'bundle_id' => $bundle->id,
             'amount' => '1800.00',
             'status' => 'pending',
         ]);

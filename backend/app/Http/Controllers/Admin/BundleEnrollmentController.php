@@ -49,7 +49,7 @@ class BundleEnrollmentController extends Controller
                     'status' => 'approved',
                     'approved_at' => now(),
                     'approved_by' => $request->user()->id,
-                    'package_enrollment_id' => $bundleEnrollment->id,
+                    'bundle_enrollment_id' => $bundleEnrollment->id,
                 ]);
             }
         });

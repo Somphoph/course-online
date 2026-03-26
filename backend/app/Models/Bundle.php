@@ -12,8 +12,6 @@ class Bundle extends Model
 {
     use HasFactory;
 
-    protected $table = 'packages';
-
     protected $fillable = [
         'title',
         'description',
@@ -37,11 +35,11 @@ class Bundle extends Model
 
     public function courses(): BelongsToMany
     {
-        return $this->belongsToMany(Course::class, 'package_courses', 'package_id', 'course_id');
+        return $this->belongsToMany(Course::class, 'bundle_courses', 'bundle_id', 'course_id');
     }
 
     public function bundleEnrollments(): HasMany
     {
-        return $this->hasMany(BundleEnrollment::class, 'package_id');
+        return $this->hasMany(BundleEnrollment::class);
     }
 }

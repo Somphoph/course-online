@@ -10,12 +10,10 @@ class BundlePayment extends Model
 {
     use HasFactory;
 
-    protected $table = 'package_payments';
-
     protected $fillable = [
-        'package_enrollment_id',
+        'bundle_enrollment_id',
         'user_id',
-        'package_id',
+        'bundle_id',
         'amount',
         'currency',
         'provider',
@@ -32,7 +30,7 @@ class BundlePayment extends Model
 
     public function bundleEnrollment(): BelongsTo
     {
-        return $this->belongsTo(BundleEnrollment::class, 'package_enrollment_id');
+        return $this->belongsTo(BundleEnrollment::class);
     }
 
     public function user(): BelongsTo
@@ -42,6 +40,6 @@ class BundlePayment extends Model
 
     public function bundle(): BelongsTo
     {
-        return $this->belongsTo(Bundle::class, 'package_id');
+        return $this->belongsTo(Bundle::class);
     }
 }

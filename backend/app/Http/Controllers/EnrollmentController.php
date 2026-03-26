@@ -34,7 +34,7 @@ class EnrollmentController extends Controller
         $alreadyEnrolled = Enrollment::query()
             ->where('user_id', $request->user()->id)
             ->where('course_id', $course->id)
-            ->whereNull('package_enrollment_id')
+            ->whereNull('bundle_enrollment_id')
             ->exists();
 
         if ($alreadyEnrolled) {

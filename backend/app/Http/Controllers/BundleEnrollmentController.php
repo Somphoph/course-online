@@ -46,15 +46,15 @@ class BundleEnrollmentController extends Controller
 
             $bundleEnrollment = BundleEnrollment::create([
                 'user_id' => $request->user()->id,
-                'package_id' => $bundle->id,
+                'bundle_id' => $bundle->id,
                 'status' => 'pending',
                 'slip_image_path' => $slipPath,
             ]);
 
             BundlePayment::create([
-                'package_enrollment_id' => $bundleEnrollment->id,
+                'bundle_enrollment_id' => $bundleEnrollment->id,
                 'user_id' => $request->user()->id,
-                'package_id' => $bundle->id,
+                'bundle_id' => $bundle->id,
                 'amount' => $bundle->price,
                 'currency' => 'THB',
                 'provider' => 'manual',

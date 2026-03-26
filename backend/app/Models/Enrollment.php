@@ -18,7 +18,7 @@ class Enrollment extends Model
         'slip_image_path',
         'approved_at',
         'approved_by',
-        'package_enrollment_id',
+        'bundle_enrollment_id',
     ];
 
     protected function casts(): array
@@ -50,6 +50,6 @@ class Enrollment extends Model
 
     public function bundleEnrollment(): BelongsTo
     {
-        return $this->belongsTo(BundleEnrollment::class, 'package_enrollment_id');
+        return $this->belongsTo(BundleEnrollment::class);
     }
 }

@@ -12,11 +12,9 @@ class BundleEnrollment extends Model
 {
     use HasFactory;
 
-    protected $table = 'package_enrollments';
-
     protected $fillable = [
         'user_id',
-        'package_id',
+        'bundle_id',
         'status',
         'slip_image_path',
         'approved_at',
@@ -37,7 +35,7 @@ class BundleEnrollment extends Model
 
     public function bundle(): BelongsTo
     {
-        return $this->belongsTo(Bundle::class, 'package_id');
+        return $this->belongsTo(Bundle::class);
     }
 
     public function approver(): BelongsTo
@@ -47,7 +45,7 @@ class BundleEnrollment extends Model
 
     public function payment(): HasOne
     {
-        return $this->hasOne(BundlePayment::class, 'package_enrollment_id');
+        return $this->hasOne(BundlePayment::class);
     }
 
     public function enrollments(): HasMany

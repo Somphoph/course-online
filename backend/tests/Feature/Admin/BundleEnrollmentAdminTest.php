@@ -20,13 +20,13 @@ class BundleEnrollmentAdminTest extends TestCase
     private function createBundleEnrollmentWithPayment(array $overrides = []): BundleEnrollment
     {
         $bundleEnrollment = BundleEnrollment::factory()->create($overrides);
-        $bundle = Bundle::findOrFail($bundleEnrollment->package_id);
+        $bundle = Bundle::findOrFail($bundleEnrollment->bundle_id);
 
         BundlePayment::create([
-            'package_enrollment_id' => $bundleEnrollment->id,
+            'bundle_enrollment_id' => $bundleEnrollment->id,
             'user_id' => $bundleEnrollment->user_id,
             'amount' => $bundle->price,
-            'package_id' => $bundleEnrollment->package_id,
+            'bundle_id' => $bundleEnrollment->bundle_id,
             'currency' => 'THB',
             'provider' => 'manual',
             'status' => 'pending',
@@ -71,7 +71,7 @@ class BundleEnrollmentAdminTest extends TestCase
 
         $bundleEnrollment = $this->createBundleEnrollmentWithPayment([
             'user_id' => $student->id,
-            'package_id' => $bundle->id,
+            'bundle_id' => $bundle->id,
             'status' => 'pending',
         ]);
 
@@ -80,13 +80,13 @@ class BundleEnrollmentAdminTest extends TestCase
         $this->postJson("/api/admin/bundle-enrollments/{$bundleEnrollment->id}/approve")
             ->assertOk();
 
-        $this->assertDatabaseHas('package_enrollments', [
+        $this->assertDatabaseHas('bundle_enrollments', [
             'id' => $bundleEnrollment->id,
             'status' => 'approved',
         ]);
 
-        $this->assertDatabaseHas('package_payments', [
-            'package_enrollment_id' => $bundleEnrollment->id,
+        $this->assertDatabaseHas('bundle_payments', [
+            'bundle_enrollment_id' => $bundleEnrollment->id,
             'status' => 'success',
         ]);
 
@@ -95,13 +95,13 @@ class BundleEnrollmentAdminTest extends TestCase
             'user_id' => $student->id,
             'course_id' => $course1->id,
             'status' => 'approved',
-            'package_enrollment_id' => $bundleEnrollment->id,
+            'bundle_enrollment_id' => $bundleEnrollment->id,
         ]);
         $this->assertDatabaseHas('enrollments', [
             'user_id' => $student->id,
             'course_id' => $course2->id,
             'status' => 'approved',
-            'package_enrollment_id' => $bundleEnrollment->id,
+            'bundle_enrollment_id' => $bundleEnrollment->id,
         ]);
     }
 
@@ -120,7 +120,7 @@ class BundleEnrollmentAdminTest extends TestCase
 
         $bundleEnrollment = $this->createBundleEnrollmentWithPayment([
             'user_id' => $student->id,
-            'package_id' => $bundle->id,
+            'bundle_id' => $bundle->id,
         ]);
 
         Sanctum::actingAs($admin);
@@ -144,13 +144,13 @@ class BundleEnrollmentAdminTest extends TestCase
         $this->postJson("/api/admin/bundle-enrollments/{$bundleEnrollment->id}/reject")
             ->assertOk();
 
-        $this->assertDatabaseHas('package_enrollments', [
+        $this->assertDatabaseHas('bundle_enrollments', [
             'id' => $bundleEnrollment->id,
             'status' => 'rejected',
         ]);
 
-        $this->assertDatabaseHas('package_payments', [
-            'package_enrollment_id' => $bundleEnrollment->id,
+        $this->assertDatabaseHas('bundle_payments', [
+            'bundle_enrollment_id' => $bundleEnrollment->id,
             'status' => 'failed',
         ]);
 

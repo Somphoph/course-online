@@ -15,7 +15,7 @@ class BundleEnrollmentFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'package_id' => Bundle::factory(),
+            'bundle_id' => Bundle::factory(),
             'status' => 'pending',
             'slip_image_path' => null,
             'approved_at' => null,
