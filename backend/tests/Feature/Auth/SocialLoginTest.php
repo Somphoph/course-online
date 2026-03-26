@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Socialite\Contracts\Provider;
 use Laravel\Socialite\Facades\Socialite;
@@ -97,5 +98,96 @@ class SocialLoginTest extends TestCase
         $this->assertNull(
             \DB::table('users')->where('email', 'newuser@example.com')->value('password')
         );
+    }
+
+    // ─── Task 6: Existing social user login ─────────────────────────────────
+
+    public function test_existing_social_user_receives_token(): void
+    {
+        $user = User::factory()->create([
+            'email'     => 'existing@example.com',
+            'google_id' => 'google_existing_999',
+            'password'  => null,
+        ]);
+
+        $this->mockSocialiteCallback('google', [
+            'id'    => 'google_existing_999',
+            'email' => 'existing@example.com',
+            'name'  => 'Existing User',
+        ]);
+
+        $response = $this->get('/api/auth/google/callback');
+
+        $response->assertRedirect();
+        $location = $response->headers->get('Location');
+        parse_str(parse_url($location, PHP_URL_QUERY), $params);
+        $this->assertArrayHasKey('token', $params);
+        $this->assertDatabaseCount('users', 1);
+    }
+
+    // ─── Task 7: Email merge + password preservation ─────────────────────────
+
+    public function test_google_login_merges_with_existing_email_password_account(): void
+    {
+        $user = User::factory()->create([
+            'email'    => 'merge@example.com',
+            'password' => 'secret123',
+        ]);
+        $this->assertNull($user->google_id);
+
+        $this->mockSocialiteCallback('google', [
+            'id'    => 'google_merge_777',
+            'email' => 'merge@example.com',
+            'name'  => 'Merge User',
+        ]);
+
+        $response = $this->get('/api/auth/google/callback');
+
+        $response->assertRedirect();
+        $location = $response->headers->get('Location');
+        parse_str(parse_url($location, PHP_URL_QUERY), $params);
+        $this->assertArrayHasKey('token', $params);
+
+        $this->assertDatabaseHas('users', [
+            'email'     => 'merge@example.com',
+            'google_id' => 'google_merge_777',
+        ]);
+        $this->assertDatabaseCount('users', 1);
+    }
+
+    public function test_merged_user_password_is_preserved(): void
+    {
+        User::factory()->create([
+            'email'    => 'preserve@example.com',
+            'password' => 'secret123',
+        ]);
+
+        $this->mockSocialiteCallback('google', [
+            'id'    => 'google_preserve_888',
+            'email' => 'preserve@example.com',
+        ]);
+
+        $this->get('/api/auth/google/callback');
+
+        $this->assertNotNull(
+            \DB::table('users')->where('email', 'preserve@example.com')->value('password')
+        );
+    }
+
+    // ─── Task 8: Facebook missing email ──────────────────────────────────────
+
+    public function test_facebook_login_without_email_redirects_with_error(): void
+    {
+        $this->mockSocialiteCallback('facebook', [
+            'id'    => 'fb_no_email',
+            'email' => null,
+        ]);
+
+        $response = $this->get('/api/auth/facebook/callback');
+
+        $response->assertRedirect();
+        $location = $response->headers->get('Location');
+        $this->assertStringContainsString('error=email_required', $location);
+        $this->assertDatabaseCount('users', 0);
     }
 }
