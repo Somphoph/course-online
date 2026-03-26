@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\IndexEnrollmentRequest;
 use App\Http\Resources\EnrollmentResource;
 use App\Models\Enrollment;
 use Illuminate\Http\JsonResponse;
@@ -12,9 +13,9 @@ use Illuminate\Support\Facades\Storage;
 
 class EnrollmentController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(IndexEnrollmentRequest $request): JsonResponse
     {
-        $status = $request->query('status', 'pending');
+        $status = $request->validated()['status'] ?? 'pending';
 
         $enrollments = Enrollment::with(['user', 'course'])
             ->where('status', $status)
@@ -51,14 +52,12 @@ class EnrollmentController extends Controller
         return response()->json(['message' => 'Enrollment rejected.']);
     }
 
-    public function slip(Enrollment $enrollment): JsonResponse
+    public function slip(Enrollment $enrollment)
     {
         if (! $enrollment->slip_image_path || ! Storage::disk('local')->exists($enrollment->slip_image_path)) {
             abort(404);
         }
 
-        return response()->json([
-            'path' => $enrollment->slip_image_path,
-        ]);
+        return Storage::disk('local')->response($enrollment->slip_image_path);
     }
 }

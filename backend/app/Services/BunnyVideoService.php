@@ -20,7 +20,7 @@ class BunnyVideoService
             throw new RuntimeException('Bunny Stream signing configuration is incomplete.');
         }
 
-        $token = hash('sha256', $tokenKey.$videoId.$expires);
+        $token = hash('sha256', $tokenKey.$libraryId.$videoId.$expires);
 
         return "{$baseUrl}/embed/{$libraryId}/{$videoId}?token={$token}&expires={$expires}";
     }

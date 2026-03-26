@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\LessonController as AdminLessonController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Resources\UserResource;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LessonVideoController;
@@ -32,7 +33,7 @@ Route::get('courses/{course:slug}', [CourseController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', function (Request $request) {
-        return $request->user();
+        return new UserResource($request->user());
     });
 
     Route::get('enrollments', [EnrollmentController::class, 'index']);

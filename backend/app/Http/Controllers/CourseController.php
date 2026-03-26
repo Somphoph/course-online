@@ -19,6 +19,8 @@ class CourseController extends Controller
 
     public function show(Request $request, Course $course): JsonResponse
     {
+        abort_unless($course->is_published, 404);
+
         $course->load([
             'lessons' => fn ($query) => $request->user()
                 ? $query
