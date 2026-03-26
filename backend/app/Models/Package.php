@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Course extends Model
+class Package extends Model
 {
     use HasFactory;
 
@@ -16,7 +17,6 @@ class Course extends Model
         'description',
         'thumbnail',
         'price',
-        'slug',
         'is_published',
     ];
 
@@ -28,24 +28,18 @@ class Course extends Model
         ];
     }
 
-    public function scopePublished($query)
+    public function scopePublished(Builder $query): Builder
     {
         return $query->where('is_published', true);
     }
 
-    public function lessons(): HasMany
+    public function courses(): BelongsToMany
     {
-        return $this->hasMany(Lesson::class)->orderBy('sort_order');
+        return $this->belongsToMany(Course::class, 'package_courses');
     }
 
-    public function enrollments(): HasMany
+    public function packageEnrollments(): HasMany
     {
-        return $this->hasMany(Enrollment::class);
+        return $this->hasMany(PackageEnrollment::class);
     }
-
-    public function packages(): BelongsToMany
-    {
-        return $this->belongsToMany(Package::class, 'package_courses');
-    }
-
 }

@@ -5,20 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Enrollment extends Model
+class PackageEnrollment extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'course_id',
+        'package_id',
         'status',
         'slip_image_path',
         'approved_at',
         'approved_by',
-        'package_enrollment_id',
     ];
 
     protected function casts(): array
@@ -33,9 +33,9 @@ class Enrollment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function course(): BelongsTo
+    public function package(): BelongsTo
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Package::class);
     }
 
     public function approver(): BelongsTo
@@ -45,11 +45,11 @@ class Enrollment extends Model
 
     public function payment(): HasOne
     {
-        return $this->hasOne(Payment::class);
+        return $this->hasOne(PackagePayment::class);
     }
 
-    public function packageEnrollment(): BelongsTo
+    public function enrollments(): HasMany
     {
-        return $this->belongsTo(PackageEnrollment::class);
+        return $this->hasMany(Enrollment::class);
     }
 }
