@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import AdminAccessGate from './admin-access-gate';
 import styles from './page.module.css';
 
 const pendingApprovals = [
@@ -42,7 +43,8 @@ const studentRows = [
 
 export default function AdminPage() {
   return (
-    <main className={styles.shell}>
+    <AdminAccessGate>
+      <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
           <span className={styles.brandMark} />
@@ -237,6 +239,7 @@ export default function AdminPage() {
           </article>
         </section>
       </section>
-    </main>
+      </main>
+    </AdminAccessGate>
   );
 }

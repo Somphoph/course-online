@@ -1,8 +1,8 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Course Online Admin',
-  description: 'Operational dashboard for the Course Online platform.',
+  title: 'Course Online',
+  description: 'Student and admin access for the Course Online platform.',
 };
 
 export default function RootLayout({ children }) {
