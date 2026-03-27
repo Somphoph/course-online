@@ -9,6 +9,7 @@ export default function AdminPage() {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState('');
+  const [actionLoading, setActionLoading] = useState(null);
 
   function loadEnrollments() {
     setLoading(true);
@@ -34,6 +35,7 @@ export default function AdminPage() {
 
   function handleApprove(id) {
     setActionError('');
+    setActionLoading(id);
     apiFetch(`/api/admin/enrollments/${id}/approve`, { method: 'POST' })
       .then((res) => {
         if (!res.ok) throw new Error('action_failed');
@@ -41,11 +43,15 @@ export default function AdminPage() {
       })
       .catch(() => {
         setActionError('Action failed. Please try again.');
+      })
+      .finally(() => {
+        setActionLoading(null);
       });
   }
 
   function handleReject(id) {
     setActionError('');
+    setActionLoading(id);
     apiFetch(`/api/admin/enrollments/${id}/reject`, { method: 'POST' })
       .then((res) => {
         if (!res.ok) throw new Error('action_failed');
@@ -53,6 +59,9 @@ export default function AdminPage() {
       })
       .catch(() => {
         setActionError('Action failed. Please try again.');
+      })
+      .finally(() => {
+        setActionLoading(null);
       });
   }
 
@@ -102,29 +111,43 @@ export default function AdminPage() {
                   <p className={styles.queueMeta}>
                     {new Date(enrollment.created_at).toLocaleDateString('th-TH')}
                   </p>
-                  <a
-                    href={`/api/admin/enrollments/${enrollment.id}/slip`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ fontSize: '0.78rem', color: 'var(--accent)' }}
+                  <button
+                    type="button"
+                    style={{ fontSize: '0.78rem', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    onClick={() => {
+                      apiFetch(`/api/admin/enrollments/${enrollment.id}/slip`)
+                        .then((res) => {
+                          if (!res.ok) throw new Error('slip_failed');
+                          return res.blob();
+                        })
+                        .then((blob) => {
+                          const url = URL.createObjectURL(blob);
+                          window.open(url, '_blank', 'noopener,noreferrer');
+                        })
+                        .catch(() => {
+                          setActionError('Unable to load slip image.');
+                        });
+                    }}
                   >
                     View slip ↗
-                  </a>
+                  </button>
                 </div>
                 <div className={styles.queueActions}>
                   <button
                     className={styles.primaryAction}
                     type="button"
+                    disabled={actionLoading !== null}
                     onClick={() => handleApprove(enrollment.id)}
                   >
-                    Approve
+                    {actionLoading === enrollment.id ? '...' : 'Approve'}
                   </button>
                   <button
                     className={styles.secondaryAction}
                     type="button"
+                    disabled={actionLoading !== null}
                     onClick={() => handleReject(enrollment.id)}
                   >
-                    Reject
+                    {actionLoading === enrollment.id ? '...' : 'Reject'}
                   </button>
                 </div>
               </div>
