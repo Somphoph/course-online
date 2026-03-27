@@ -50,6 +50,25 @@
   max-width: 52ch;
 }
 
+.ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0052ae, #006adc);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: box-shadow 0.15s;
+}
+
+.ctaBtn:hover {
+  box-shadow: 0 8px 24px rgba(0, 106, 220, 0.3);
+}
+
 .grid {
   max-width: 880px;
   margin: 0 auto;

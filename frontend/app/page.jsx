@@ -34,6 +34,9 @@ export default function HomePage() {
           Courses covering Microsoft Excel, MS Access, Power Automate, and App Sheet.
           Browse below and enrol when you&apos;re ready.
         </p>
+        <a href="#courses" className={styles.ctaBtn}>
+          ดูคอร์สทั้งหมด →
+        </a>
       </header>
 
       {loading ? (
@@ -46,7 +49,7 @@ export default function HomePage() {
           <p>No courses available yet. Check back soon.</p>
         </div>
       ) : (
-        <div className={styles.grid}>
+        <div id="courses" className={styles.grid}>
           {courses.map((course) => (
             <Link key={course.slug} href={`/courses/${course.slug}`} className={styles.card}>
               {course.thumbnail ? (
