@@ -1,4 +1,5 @@
 import './globals.css';
+import Navbar from './_components/navbar';
 
 export const metadata = {
   title: 'Course Online',
@@ -8,7 +9,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        <div style={{ paddingTop: '64px' }}>{children}</div>
+      </body>
     </html>
   );
 }

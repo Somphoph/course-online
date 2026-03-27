@@ -55,4 +55,10 @@ export async function runRouteSmokeTests() {
   assert.match(enrollPage, /FormData/);
   assert.match(enrollPage, /slip_image/);
   assert.match(enrollPage, /readAuthToken/);
+
+  const navbar = await readAppFile('_components/navbar.jsx');
+  assert.match(navbar, /My Courses/);
+  assert.match(navbar, /Log in/);
+  assert.match(navbar, /readAuthToken/);
+  assert.match(navbar, /\/admin/);
 }
