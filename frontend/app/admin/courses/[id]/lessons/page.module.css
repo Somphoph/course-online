@@ -1,0 +1,230 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 32px 20px;
+  border-bottom: 1px solid rgba(25, 28, 34, 0.06);
+}
+
+.topbarLabel {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0 0 4px;
+}
+
+.topbarTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  font-family: Manrope, sans-serif;
+}
+
+.breadcrumb {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.breadcrumb:hover {
+  text-decoration: underline;
+}
+
+.createBtn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0052ae, #006adc);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.createBtn:hover {
+  opacity: 0.88;
+}
+
+.formPanel {
+  margin: 20px 32px;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid rgba(25, 28, 34, 0.08);
+}
+
+.formTitle {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.formError {
+  margin: 0 0 12px;
+  color: #b91c1c;
+  font-size: 0.88rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.input {
+  padding: 9px 12px;
+  border: 1px solid rgba(25, 28, 34, 0.16);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--page-bg);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.checkField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.saveBtn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0052ae, #006adc);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.saveBtn:hover {
+  opacity: 0.88;
+}
+
+.cancelBtn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  background: var(--surface-weak);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: rgba(25, 28, 34, 0.08);
+}
+
+.empty {
+  padding: 40px 32px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.lessonList {
+  padding: 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lessonRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border-radius: 10px;
+  border: 1px solid rgba(25, 28, 34, 0.06);
+}
+
+.lessonOrder {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 600;
+  min-width: 28px;
+}
+
+.lessonInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.lessonTitle {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 3px;
+}
+
+.lessonMeta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0;
+  word-break: break-all;
+}
+
+.lessonActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.editBtn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: var(--surface-weak);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.editBtn:hover {
+  background: rgba(25, 28, 34, 0.1);
+}
+
+.deleteBtn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(220, 38, 38, 0.06);
+  color: #b91c1c;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  background: rgba(220, 38, 38, 0.12);
+}
