@@ -12,7 +12,8 @@ async function readAppFile(relativePath) {
 
 export async function runRouteSmokeTests() {
   const root = await readAppFile('page.jsx');
-  assert.match(root, /redirect\('\/login'\)/);
+  assert.match(root, /\/api\/courses/);
+  assert.match(root, /courses\/\$\{course\.slug\}/);
 
   const login = await readAppFile('login/page.jsx');
   assert.match(login, /Continue with Google/);
