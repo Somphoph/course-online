@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const token = readAuthToken();
@@ -33,15 +34,21 @@ export default function DashboardPage() {
           router.replace('/login?error=session_expired');
           return null;
         }
+
+        if (!res.ok) {
+          throw new Error('Unable to load enrollments.');
+        }
+
         return res.json();
       })
       .then((payload) => {
         if (payload) {
+          setError('');
           setEnrollments(payload.data ?? payload);
         }
       })
       .catch(() => {
-        setEnrollments([]);
+        setError('Unable to load enrolments right now. Please try again.');
       })
       .finally(() => {
         setLoading(false);
@@ -87,6 +94,8 @@ export default function DashboardPage() {
           <h2 className={styles.panelTitle}>Account overview</h2>
           {loading ? (
             <p style={{ color: 'rgba(25,28,34,0.56)', marginTop: 20 }}>Loading...</p>
+          ) : error ? (
+            <p style={{ color: 'rgba(25,28,34,0.56)', marginTop: 20 }}>{error}</p>
           ) : (
             <div className={styles.stats}>
               <div>
@@ -110,6 +119,8 @@ export default function DashboardPage() {
           <h2 className={styles.panelTitle}>Your courses</h2>
           {loading ? (
             <p style={{ color: 'rgba(25,28,34,0.56)', marginTop: 20 }}>Loading...</p>
+          ) : error ? (
+            <p style={{ color: 'rgba(25,28,34,0.56)', marginTop: 20 }}>{error}</p>
           ) : enrollments.length === 0 ? (
             <p style={{ color: 'rgba(25,28,34,0.56)', marginTop: 20 }}>
               No enrolments yet.{' '}

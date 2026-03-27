@@ -53,6 +53,6 @@ export async function runRouteSmokeTests() {
   const enrollPage = await readAppFile('courses/[slug]/enroll/page.jsx');
   assert.match(enrollPage, /\/api\/enrollments/);
   assert.match(enrollPage, /FormData/);
-  assert.match(enrollPage, /slip/);
+  assert.match(enrollPage, /slip_image/);
   assert.match(enrollPage, /readAuthToken/);
 }

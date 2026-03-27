@@ -55,7 +55,7 @@ export default function EnrollPage({ params }) {
       const token = readAuthToken();
       const body = new FormData();
       body.append('course_id', course.id);
-      body.append('slip', file);
+      body.append('slip_image', file);
 
       const response = await fetch('/api/enrollments', {
         method: 'POST',
@@ -121,7 +121,7 @@ export default function EnrollPage({ params }) {
               required
               disabled={submitting || !!success}
             />
-            <span className={styles.hint}>JPG, PNG, or WEBP. Max 5 MB.</span>
+            <span className={styles.hint}>JPG, PNG, or WEBP. Max 2 MB.</span>
           </label>
 
           <button
