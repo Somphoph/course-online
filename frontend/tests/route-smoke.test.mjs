@@ -39,4 +39,9 @@ export async function runRouteSmokeTests() {
   const apiHelper = await readAppFile('_components/api.js');
   assert.match(apiHelper, /apiFetch/);
   assert.match(apiHelper, /Authorization/);
+
+  const courseDetail = await readAppFile('courses/[slug]/page.jsx');
+  assert.match(courseDetail, /\/api\/courses\/\$\{slug\}/);
+  assert.match(courseDetail, /enroll/);
+  assert.match(courseDetail, /formatDuration/);
 }
