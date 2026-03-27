@@ -23,7 +23,7 @@ export default function AdminShell({ children }) {
             <span className={styles.brandMark} />
             <div>
               <p className={styles.brandKicker}>Course Online</p>
-              <h1 className={styles.brandTitle}>Admin</h1>
+              <p className={styles.brandTitle}>Admin</p>
             </div>
           </div>
 
