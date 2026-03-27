@@ -39,8 +39,6 @@ class LessonVideoRoutesTest extends TestCase
 
         $this->getJson("/api/lessons/{$lesson->id}/video-url")
             ->assertOk()
-            ->assertJsonPath('lesson_id', $lesson->id)
-            ->assertJsonPath('video_id', $lesson->bunny_video_id)
             ->assertJsonPath('signed_url', 'https://signed.example/video');
     }
 

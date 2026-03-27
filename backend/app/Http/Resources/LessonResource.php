@@ -13,10 +13,10 @@ class LessonResource extends JsonResource
             'id' => $this->id,
             'course_id' => $this->course_id,
             'title' => $this->title,
-            'bunny_video_id' => $this->bunny_video_id,
             'sort_order' => $this->sort_order,
             'duration_seconds' => $this->duration_seconds,
             'is_preview' => $this->is_preview,
+            'bunny_video_id' => $this->when($request->user()?->isAdmin(), $this->bunny_video_id),
         ];
     }
 }

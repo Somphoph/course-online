@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreCourseRequest;
+use App\Http\Requests\Admin\UpdateCourseRequest;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CourseController extends Controller
 {
@@ -17,16 +19,9 @@ class CourseController extends Controller
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreCourseRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'thumbnail' => ['nullable', 'string', 'max:255'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'slug' => ['required', 'string', 'unique:courses,slug'],
-            'is_published' => ['boolean'],
-        ]);
+        $data = $request->validated();
 
         $course = Course::create($data);
 
@@ -35,16 +30,9 @@ class CourseController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, Course $course): JsonResponse
+    public function update(UpdateCourseRequest $request, Course $course): JsonResponse
     {
-        $data = $request->validate([
-            'title' => ['sometimes', 'string', 'max:255'],
-            'description' => ['sometimes', 'string'],
-            'thumbnail' => ['nullable', 'string', 'max:255'],
-            'price' => ['sometimes', 'numeric', 'min:0'],
-            'slug' => ['sometimes', 'string', 'unique:courses,slug,' . $course->id],
-            'is_published' => ['sometimes', 'boolean'],
-        ]);
+        $data = $request->validated();
 
         $course->update($data);
 
@@ -53,10 +41,10 @@ class CourseController extends Controller
         ]);
     }
 
-    public function destroy(Course $course): JsonResponse
+    public function destroy(Course $course): Response
     {
         $course->delete();
 
-        return response()->json([], 204);
+        return response()->noContent();
     }
 }

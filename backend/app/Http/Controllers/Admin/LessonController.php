@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreLessonRequest;
+use App\Http\Requests\Admin\UpdateLessonRequest;
 use App\Http\Resources\LessonResource;
 use App\Models\Course;
 use App\Models\Lesson;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class LessonController extends Controller
 {
@@ -18,15 +20,9 @@ class LessonController extends Controller
         ]);
     }
 
-    public function store(Request $request, Course $course): JsonResponse
+    public function store(StoreLessonRequest $request, Course $course): JsonResponse
     {
-        $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'bunny_video_id' => ['required', 'string', 'max:255'],
-            'sort_order' => ['required', 'integer', 'min:0'],
-            'duration_seconds' => ['nullable', 'integer', 'min:0'],
-            'is_preview' => ['boolean'],
-        ]);
+        $data = $request->validated();
 
         $lesson = $course->lessons()->create($data);
 
@@ -35,15 +31,9 @@ class LessonController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, Lesson $lesson): JsonResponse
+    public function update(UpdateLessonRequest $request, Lesson $lesson): JsonResponse
     {
-        $data = $request->validate([
-            'title' => ['sometimes', 'string', 'max:255'],
-            'bunny_video_id' => ['sometimes', 'string', 'max:255'],
-            'sort_order' => ['sometimes', 'integer', 'min:0'],
-            'duration_seconds' => ['nullable', 'integer', 'min:0'],
-            'is_preview' => ['sometimes', 'boolean'],
-        ]);
+        $data = $request->validated();
 
         $lesson->update($data);
 
@@ -52,10 +42,10 @@ class LessonController extends Controller
         ]);
     }
 
-    public function destroy(Lesson $lesson): JsonResponse
+    public function destroy(Lesson $lesson): Response
     {
         $lesson->delete();
 
-        return response()->json([], 204);
+        return response()->noContent();
     }
 }

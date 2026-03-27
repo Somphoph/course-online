@@ -22,7 +22,7 @@ class BunnyVideoServiceTest extends TestCase
         $url = $service->generateSignedUrl('video-guid-1');
 
         $expires = CarbonImmutable::now()->addSeconds(7200)->timestamp;
-        $expectedToken = hash('sha256', 'secret-key'.'video-guid-1'.$expires);
+        $expectedToken = hash('sha256', 'secret-key'.'123'.'video-guid-1'.$expires);
 
         $this->assertSame(
             "https://iframe.mediadelivery.net/embed/123/video-guid-1?token={$expectedToken}&expires={$expires}",

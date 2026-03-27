@@ -1,0 +1,102 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(25, 28, 34, 0.06);
+}
+
+.inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.brandMark {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0052ae, #006adc);
+  flex-shrink: 0;
+}
+
+.brandName {
+  font-family: Manrope, Inter, ui-sans-serif, sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #191c22;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navLink {
+  font-size: 0.9rem;
+  color: #191c22;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.navLink:hover {
+  color: #006adc;
+}
+
+.loginBtn {
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0052ae, #006adc);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.loginBtn:hover {
+  box-shadow: 0 4px 16px rgba(0, 106, 220, 0.35);
+}
+
+.loginBtn:focus-visible {
+  outline: 2px solid #006adc;
+  outline-offset: 2px;
+}
+
+.signOutBtn {
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: rgba(25, 28, 34, 0.06);
+  color: #191c22;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+}
+
+@media (max-width: 600px) {
+  .inner {
+    padding: 0 16px;
+  }
+
+  .navLink {
+    display: none;
+  }
+}

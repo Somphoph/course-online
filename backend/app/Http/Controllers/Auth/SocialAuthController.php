@@ -59,13 +59,11 @@ class SocialAuthController extends Controller
         // 3. Create new user
         if (! $user) {
             $user = User::create([
-                'name'              => $socialUser->getName(),
-                'email'             => $socialUser->getEmail(),
-                $field              => $socialUser->getId(),
-                'avatar'            => $socialUser->getAvatar(),
-                'password'          => null,
-                'role'              => 'student',
-                'email_verified_at' => now(),
+                'name' => $socialUser->getName(),
+                'email' => $socialUser->getEmail(),
+                $field => $socialUser->getId(),
+                'avatar' => $socialUser->getAvatar(),
+                'password' => null,
             ]);
         }
 

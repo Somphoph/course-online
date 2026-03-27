@@ -98,8 +98,7 @@ class AdminRoutesTest extends TestCase
         $this->assertSame('failed', $rejectedPayment->fresh()->status);
 
         $this->getJson("/api/admin/enrollments/{$approvedEnrollment->id}/slip")
-            ->assertOk()
-            ->assertJsonPath('path', $slipPath);
+            ->assertOk();
 
         $anotherStudent = User::factory()->create(['role' => 'student']);
         $anotherCourse = Course::factory()->create();

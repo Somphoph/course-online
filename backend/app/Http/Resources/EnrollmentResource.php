@@ -12,7 +12,6 @@ class EnrollmentResource extends JsonResource
         return [
             'id' => $this->id,
             'status' => $this->status,
-            'slip_image_path' => $this->slip_image_path,
             'approved_at' => $this->approved_at,
             'created_at' => $this->created_at,
             'course' => $this->whenLoaded('course', fn () => [
