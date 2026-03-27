@@ -34,4 +34,8 @@ export async function runRouteSmokeTests() {
   const callback = await readAppFile('auth/callback/page.jsx');
   assert.match(callback, /resolveDestinationForRole/);
   assert.match(callback, /writeAuthToken/);
+
+  const apiHelper = await readAppFile('_components/api.js');
+  assert.match(apiHelper, /apiFetch/);
+  assert.match(apiHelper, /Authorization/);
 }
