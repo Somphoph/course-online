@@ -44,4 +44,9 @@ export async function runRouteSmokeTests() {
   assert.match(courseDetail, /\/api\/courses\/\$\{slug\}/);
   assert.match(courseDetail, /enroll/);
   assert.match(courseDetail, /formatDuration/);
+
+  const dashboard = await readAppFile('dashboard/page.jsx');
+  assert.match(dashboard, /apiFetch/);
+  assert.match(dashboard, /\/api\/enrollments/);
+  assert.match(dashboard, /session_expired/);
 }

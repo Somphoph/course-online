@@ -1,25 +1,56 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { apiFetch } from '../_components/api';
+import { readAuthToken, clearAuthToken } from '../_components/auth-session';
 import styles from './page.module.css';
 
-const courseRows = [
-  {
-    title: 'Excel Fundamentals Bundle',
-    meta: '4 courses available',
-    status: 'Learning path ready',
-  },
-  {
-    title: 'Power Automate Bundle',
-    meta: '3 courses available',
-    status: 'Waiting for approval',
-  },
-  {
-    title: 'App Sheet Starter Bundle',
-    meta: '5 courses available',
-    status: 'Preview lessons unlocked',
-  },
-];
+const STATUS_LABELS = {
+  approved: 'Learning unlocked',
+  pending: 'Awaiting approval',
+  rejected: 'Enrolment rejected',
+};
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [enrollments, setEnrollments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = readAuthToken();
+
+    if (!token) {
+      router.replace('/login?error=session_expired');
+      return;
+    }
+
+    apiFetch('/api/enrollments')
+      .then((res) => {
+        if (res.status === 401) {
+          clearAuthToken();
+          router.replace('/login?error=session_expired');
+          return null;
+        }
+        return res.json();
+      })
+      .then((payload) => {
+        if (payload) {
+          setEnrollments(payload.data ?? payload);
+        }
+      })
+      .catch(() => {
+        setEnrollments([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [router]);
+
+  const approved = enrollments.filter((e) => e.status === 'approved').length;
+  const pending = enrollments.filter((e) => e.status === 'pending').length;
+
   return (
     <main className={styles.shell}>
       <section className={styles.hero}>
@@ -30,14 +61,21 @@ export default function DashboardPage() {
 
         <h1 className={styles.title}>Your learning space</h1>
         <p className={styles.lead}>
-          A simple home for enrolled courses, approval status, and the next lesson to continue.
+          Your enrolled courses, approval statuses, and next lessons to continue.
         </p>
 
         <div className={styles.actions}>
-          <Link className={styles.primaryLink} href="/login">
-            Switch account
-          </Link>
-          <Link className={styles.secondaryLink} href="/courses">
+          <button
+            className={styles.primaryLink}
+            type="button"
+            onClick={() => {
+              clearAuthToken();
+              router.replace('/login');
+            }}
+          >
+            Sign out
+          </button>
+          <Link className={styles.secondaryLink} href="/">
             Browse courses
           </Link>
         </div>
@@ -47,36 +85,55 @@ export default function DashboardPage() {
         <article className={styles.panel}>
           <p className={styles.kicker}>Status</p>
           <h2 className={styles.panelTitle}>Account overview</h2>
-          <div className={styles.stats}>
-            <div>
-              <p className={styles.statValue}>3</p>
-              <p className={styles.statLabel}>Active bundles</p>
+          {loading ? (
+            <p style={{ color: 'rgba(25,28,34,0.56)', marginTop: 20 }}>Loading...</p>
+          ) : (
+            <div className={styles.stats}>
+              <div>
+                <p className={styles.statValue}>{enrollments.length}</p>
+                <p className={styles.statLabel}>Total enrolments</p>
+              </div>
+              <div>
+                <p className={styles.statValue}>{approved}</p>
+                <p className={styles.statLabel}>Approved</p>
+              </div>
+              <div>
+                <p className={styles.statValue}>{pending}</p>
+                <p className={styles.statLabel}>Pending approval</p>
+              </div>
             </div>
-            <div>
-              <p className={styles.statValue}>1</p>
-              <p className={styles.statLabel}>Pending approval</p>
-            </div>
-            <div>
-              <p className={styles.statValue}>7</p>
-              <p className={styles.statLabel}>Preview lessons</p>
-            </div>
-          </div>
+          )}
         </article>
 
         <article className={styles.panel}>
-          <p className={styles.kicker}>Continue</p>
-          <h2 className={styles.panelTitle}>Your bundles</h2>
-          <div className={styles.courseList}>
-            {courseRows.map((course) => (
-              <div key={course.title} className={styles.courseRow}>
-                <div>
-                  <p className={styles.courseTitle}>{course.title}</p>
-                  <p className={styles.courseMeta}>{course.meta}</p>
+          <p className={styles.kicker}>Enrolments</p>
+          <h2 className={styles.panelTitle}>Your courses</h2>
+          {loading ? (
+            <p style={{ color: 'rgba(25,28,34,0.56)', marginTop: 20 }}>Loading...</p>
+          ) : enrollments.length === 0 ? (
+            <p style={{ color: 'rgba(25,28,34,0.56)', marginTop: 20 }}>
+              No enrolments yet.{' '}
+              <Link href="/" style={{ color: '#006adc' }}>
+                Browse courses
+              </Link>
+            </p>
+          ) : (
+            <div className={styles.courseList}>
+              {enrollments.map((enrolment) => (
+                <div key={enrolment.id} className={styles.courseRow}>
+                  <div>
+                    <p className={styles.courseTitle}>{enrolment.course?.title ?? '—'}</p>
+                    <p className={styles.courseMeta}>
+                      Submitted {new Date(enrolment.created_at).toLocaleDateString('th-TH')}
+                    </p>
+                  </div>
+                  <span className={styles.courseStatus}>
+                    {STATUS_LABELS[enrolment.status] ?? enrolment.status}
+                  </span>
                 </div>
-                <span className={styles.courseStatus}>{course.status}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </article>
       </section>
     </main>
