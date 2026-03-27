@@ -30,7 +30,7 @@ export async function runRouteSmokeTests() {
   assert.doesNotMatch(adminLogin, /Continue with Facebook/);
 
   const adminPage = await readAppFile('admin/page.jsx');
-  assert.match(adminPage, /AdminAccessGate/);
+  assert.match(adminPage, /AdminShell/);
 
   const callback = await readAppFile('auth/callback/page.jsx');
   assert.match(callback, /resolveDestinationForRole/);
