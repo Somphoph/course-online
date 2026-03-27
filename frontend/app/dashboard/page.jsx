@@ -13,6 +13,12 @@ const STATUS_LABELS = {
   rejected: 'Enrolment rejected',
 };
 
+const STATUS_CLASSES = {
+  approved: styles.statusApproved,
+  pending: styles.statusPending,
+  rejected: styles.statusRejected,
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const [enrollments, setEnrollments] = useState([]);
@@ -138,7 +144,7 @@ export default function DashboardPage() {
                       Submitted {new Date(enrolment.created_at).toLocaleDateString('th-TH')}
                     </p>
                   </div>
-                  <span className={styles.courseStatus}>
+                  <span className={STATUS_CLASSES[enrolment.status] ?? styles.statusPending}>
                     {STATUS_LABELS[enrolment.status] ?? enrolment.status}
                   </span>
                 </div>
