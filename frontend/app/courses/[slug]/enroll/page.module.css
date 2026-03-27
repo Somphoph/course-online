@@ -55,6 +55,44 @@
   color: rgba(25, 28, 34, 0.72);
 }
 
+.bankBox {
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: rgba(0, 106, 220, 0.06);
+  border-left: 3px solid #006adc;
+  margin-bottom: 8px;
+}
+
+.bankBoxTitle {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0052ae;
+}
+
+.bankRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.bankLabel {
+  font-size: 0.82rem;
+  color: rgba(25, 28, 34, 0.6);
+  flex-shrink: 0;
+}
+
+.bankValue {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #191c22;
+  text-align: right;
+}
+
 .courseTitle {
   margin: 0 0 24px;
   padding: 16px;

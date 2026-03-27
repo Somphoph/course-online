@@ -6,6 +6,12 @@ import { useRouter } from 'next/navigation';
 import { readAuthToken } from '../../../_components/auth-session';
 import styles from './page.module.css';
 
+const BANK_INFO = {
+  bank: 'กสิกรไทย (KBank)',
+  accountName: 'บริษัท คอร์ส ออนไลน์ จำกัด',
+  accountNumber: 'XXX-X-XXXXX-X',
+};
+
 export default function EnrollPage({ params }) {
   const { slug } = use(params);
   const router = useRouter();
@@ -106,6 +112,22 @@ export default function EnrollPage({ params }) {
         {course?.title ? (
           <p className={styles.courseTitle}>{course.title}</p>
         ) : null}
+
+        <div className={styles.bankBox}>
+          <p className={styles.bankBoxTitle}>โอนเงินมาที่</p>
+          <div className={styles.bankRow}>
+            <span className={styles.bankLabel}>ธนาคาร</span>
+            <span className={styles.bankValue}>{BANK_INFO.bank}</span>
+          </div>
+          <div className={styles.bankRow}>
+            <span className={styles.bankLabel}>ชื่อบัญชี</span>
+            <span className={styles.bankValue}>{BANK_INFO.accountName}</span>
+          </div>
+          <div className={styles.bankRow}>
+            <span className={styles.bankLabel}>เลขบัญชี</span>
+            <span className={styles.bankValue}>{BANK_INFO.accountNumber}</span>
+          </div>
+        </div>
 
         {error ? <p className={styles.alert}>{error}</p> : null}
         {success ? <p className={styles.success}>{success}</p> : null}
