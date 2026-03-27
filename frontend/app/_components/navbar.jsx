@@ -30,7 +30,7 @@ export default function Navbar() {
     <header className={styles.navbar}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand}>
-          <span className={styles.brandMark} />
+          <span className={styles.brandMark} aria-hidden="true" />
           <span className={styles.brandName}>Course Online</span>
         </Link>
 
