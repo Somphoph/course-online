@@ -86,6 +86,7 @@
   background: var(--page-bg);
   width: 100%;
   resize: vertical;
+  box-sizing: border-box;
 }
 
 .input:focus,

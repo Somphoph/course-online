@@ -120,11 +120,50 @@ export default function AdminCoursesPage() {
   async function handleDelete(id) {
     if (!window.confirm('Delete this course? This cannot be undone.')) return;
     try {
-      await apiFetch(`/api/admin/courses/${id}`, { method: 'DELETE' });
+      const res = await apiFetch(`/api/admin/courses/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        setError('Delete failed. Please try again.');
+        return;
+      }
       loadCourses();
     } catch {
-      // ignore
+      setError('Delete failed. Please try again.');
     }
+  }
+
+  function CourseForm({ submitLabel }) {
+    return (
+      <form className={styles.form} onSubmit={handleSave}>
+        <label className={styles.field}>
+          <span className={styles.label}>Title</span>
+          <input className={styles.input} name="title" required value={form.title} onChange={handleChange} />
+        </label>
+        <label className={styles.field}>
+          <span className={styles.label}>Slug</span>
+          <input className={styles.input} name="slug" required value={form.slug} onChange={handleChange} />
+        </label>
+        <label className={styles.field}>
+          <span className={styles.label}>Price (THB)</span>
+          <input className={styles.input} name="price" type="number" min="0" step="0.01" required value={form.price} onChange={handleChange} />
+        </label>
+        <label className={styles.field}>
+          <span className={styles.label}>Description</span>
+          <textarea className={styles.textarea} name="description" required value={form.description} onChange={handleChange} rows={3} />
+        </label>
+        <label className={styles.field}>
+          <span className={styles.label}>Thumbnail URL (optional)</span>
+          <input className={styles.input} name="thumbnail" value={form.thumbnail} onChange={handleChange} />
+        </label>
+        <label className={styles.checkField}>
+          <input type="checkbox" name="is_published" checked={form.is_published} onChange={handleChange} />
+          <span>Published</span>
+        </label>
+        <div className={styles.formActions}>
+          <button className={styles.saveBtn} type="submit" disabled={saving}>{saving ? 'Saving...' : submitLabel}</button>
+          <button className={styles.cancelBtn} type="button" onClick={closeForm}>Cancel</button>
+        </div>
+      </form>
+    );
   }
 
   return (
@@ -143,36 +182,7 @@ export default function AdminCoursesPage() {
         <div className={styles.formPanel}>
           <h3 className={styles.formTitle}>Create course</h3>
           {error ? <p className={styles.formError}>{error}</p> : null}
-          <form className={styles.form} onSubmit={handleSave}>
-            <label className={styles.field}>
-              <span className={styles.label}>Title</span>
-              <input className={styles.input} name="title" required value={form.title} onChange={handleChange} />
-            </label>
-            <label className={styles.field}>
-              <span className={styles.label}>Slug</span>
-              <input className={styles.input} name="slug" required value={form.slug} onChange={handleChange} />
-            </label>
-            <label className={styles.field}>
-              <span className={styles.label}>Price (THB)</span>
-              <input className={styles.input} name="price" type="number" min="0" step="0.01" required value={form.price} onChange={handleChange} />
-            </label>
-            <label className={styles.field}>
-              <span className={styles.label}>Description</span>
-              <textarea className={styles.textarea} name="description" required value={form.description} onChange={handleChange} rows={3} />
-            </label>
-            <label className={styles.field}>
-              <span className={styles.label}>Thumbnail URL (optional)</span>
-              <input className={styles.input} name="thumbnail" value={form.thumbnail} onChange={handleChange} />
-            </label>
-            <label className={styles.checkField}>
-              <input type="checkbox" name="is_published" checked={form.is_published} onChange={handleChange} />
-              <span>Published</span>
-            </label>
-            <div className={styles.formActions}>
-              <button className={styles.saveBtn} type="submit" disabled={saving}>{saving ? 'Saving...' : 'Create course'}</button>
-              <button className={styles.cancelBtn} type="button" onClick={closeForm}>Cancel</button>
-            </div>
-          </form>
+          <CourseForm submitLabel="Create course" />
         </div>
       )}
 
@@ -188,36 +198,7 @@ export default function AdminCoursesPage() {
                 <div className={styles.formPanel}>
                   <h3 className={styles.formTitle}>Edit course</h3>
                   {error ? <p className={styles.formError}>{error}</p> : null}
-                  <form className={styles.form} onSubmit={handleSave}>
-                    <label className={styles.field}>
-                      <span className={styles.label}>Title</span>
-                      <input className={styles.input} name="title" required value={form.title} onChange={handleChange} />
-                    </label>
-                    <label className={styles.field}>
-                      <span className={styles.label}>Slug</span>
-                      <input className={styles.input} name="slug" required value={form.slug} onChange={handleChange} />
-                    </label>
-                    <label className={styles.field}>
-                      <span className={styles.label}>Price (THB)</span>
-                      <input className={styles.input} name="price" type="number" min="0" step="0.01" required value={form.price} onChange={handleChange} />
-                    </label>
-                    <label className={styles.field}>
-                      <span className={styles.label}>Description</span>
-                      <textarea className={styles.textarea} name="description" required value={form.description} onChange={handleChange} rows={3} />
-                    </label>
-                    <label className={styles.field}>
-                      <span className={styles.label}>Thumbnail URL (optional)</span>
-                      <input className={styles.input} name="thumbnail" value={form.thumbnail} onChange={handleChange} />
-                    </label>
-                    <label className={styles.checkField}>
-                      <input type="checkbox" name="is_published" checked={form.is_published} onChange={handleChange} />
-                      <span>Published</span>
-                    </label>
-                    <div className={styles.formActions}>
-                      <button className={styles.saveBtn} type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save changes'}</button>
-                      <button className={styles.cancelBtn} type="button" onClick={closeForm}>Cancel</button>
-                    </div>
-                  </form>
+                  <CourseForm submitLabel="Save changes" />
                 </div>
               ) : (
                 <div className={styles.courseRow}>
