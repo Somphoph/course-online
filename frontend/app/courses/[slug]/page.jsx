@@ -64,6 +64,15 @@ export default function CourseDetailPage({ params }) {
 
       <div className={styles.layout}>
         <section className={styles.hero}>
+          {course.thumbnail ? (
+            <img
+              className={styles.heroThumb}
+              src={course.thumbnail}
+              alt={course.title}
+            />
+          ) : (
+            <div className={styles.heroThumb} role="presentation" />
+          )}
           <p className={styles.kicker}>Course</p>
           <h1 className={styles.title}>{course.title}</h1>
           <p className={styles.description}>{course.description}</p>
