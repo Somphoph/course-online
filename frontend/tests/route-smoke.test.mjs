@@ -61,4 +61,16 @@ export async function runRouteSmokeTests() {
   assert.match(navbar, /Log in/);
   assert.match(navbar, /readAuthToken/);
   assert.match(navbar, /\/admin/);
+
+  const adminCourses = await readAppFile('admin/courses/page.jsx');
+  assert.match(adminCourses, /\/api\/admin\/courses/);
+  assert.match(adminCourses, /apiFetch/);
+
+  const adminLessons = await readAppFile('admin/courses/[id]/lessons/page.jsx');
+  assert.match(adminLessons, /\/api\/admin\/courses/);
+  assert.match(adminLessons, /bunny_video_id/);
+
+  const adminStudents = await readAppFile('admin/students/page.jsx');
+  assert.match(adminStudents, /\/api\/admin\/students/);
+  assert.match(adminStudents, /enrollment_count/);
 }
