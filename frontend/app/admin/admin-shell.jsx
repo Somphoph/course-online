@@ -7,7 +7,6 @@ import styles from './page.module.css';
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard' },
-  { href: '/admin/enrollments', label: 'Enrollments' },
   { href: '/admin/courses', label: 'Courses' },
   { href: '/admin/students', label: 'Students' },
 ];
