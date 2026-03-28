@@ -169,7 +169,11 @@ export async function mockApi(page, overrides = {}) {
 }
 
 export async function setAuthToken(page, token) {
-  await page.addInitScript(
+  if (page.url() === 'about:blank') {
+    await page.goto('/');
+  }
+
+  await page.evaluate(
     ({ key, value }) => {
       window.localStorage.setItem(key, value);
     },
