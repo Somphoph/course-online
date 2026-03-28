@@ -21,8 +21,13 @@ class CourseController extends Controller
     {
         abort_unless($course->is_published, 404);
 
+        $hasAccess = $request->user()?->enrollments()
+            ->where('course_id', $course->id)
+            ->where('status', 'approved')
+            ->exists();
+
         $course->load([
-            'lessons' => fn ($query) => $request->user()
+            'lessons' => fn ($query) => $hasAccess
                 ? $query
                 : $query->where('is_preview', true),
         ]);

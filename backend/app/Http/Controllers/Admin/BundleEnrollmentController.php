@@ -43,14 +43,18 @@ class BundleEnrollmentController extends Controller
             $bundleEnrollment->payment()->update(['status' => 'success']);
 
             foreach ($bundleEnrollment->bundle->courses as $course) {
-                Enrollment::create([
-                    'user_id' => $bundleEnrollment->user_id,
-                    'course_id' => $course->id,
-                    'status' => 'approved',
-                    'approved_at' => now(),
-                    'approved_by' => $request->user()->id,
-                    'bundle_enrollment_id' => $bundleEnrollment->id,
-                ]);
+                Enrollment::updateOrCreate(
+                    [
+                        'user_id' => $bundleEnrollment->user_id,
+                        'course_id' => $course->id,
+                    ],
+                    [
+                        'status' => 'approved',
+                        'approved_at' => now(),
+                        'approved_by' => $request->user()->id,
+                        'bundle_enrollment_id' => $bundleEnrollment->id,
+                    ]
+                );
             }
         });
 

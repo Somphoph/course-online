@@ -105,7 +105,7 @@ class BundleEnrollmentAdminTest extends TestCase
         ]);
     }
 
-    public function test_approve_allows_duplicate_course_enrollments_from_bundle(): void
+    public function test_approve_does_not_duplicate_existing_course_enrollment(): void
     {
         $admin = User::factory()->admin()->create();
         $student = User::factory()->create();
@@ -128,7 +128,7 @@ class BundleEnrollmentAdminTest extends TestCase
         $this->postJson("/api/admin/bundle-enrollments/{$bundleEnrollment->id}/approve")
             ->assertOk();
 
-        $this->assertSame(2, Enrollment::query()
+        $this->assertSame(1, Enrollment::query()
             ->where('user_id', $student->id)
             ->where('course_id', $course->id)
             ->count());
