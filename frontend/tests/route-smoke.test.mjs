@@ -30,7 +30,7 @@ export async function runRouteSmokeTests() {
   assert.doesNotMatch(adminLogin, /Continue with Facebook/);
 
   const adminPage = await readAppFile('admin/page.jsx');
-  assert.match(adminPage, /AdminAccessGate/);
+  assert.match(adminPage, /AdminShell/);
 
   const callback = await readAppFile('auth/callback/page.jsx');
   assert.match(callback, /resolveDestinationForRole/);
@@ -61,4 +61,32 @@ export async function runRouteSmokeTests() {
   assert.match(navbar, /Log in/);
   assert.match(navbar, /readAuthToken/);
   assert.match(navbar, /\/admin/);
+
+  const adminCourses = await readAppFile('admin/courses/page.jsx');
+  assert.match(adminCourses, /\/api\/admin\/courses/);
+  assert.match(adminCourses, /apiFetch/);
+
+  const adminLessons = await readAppFile('admin/courses/[id]/lessons/page.jsx');
+  assert.match(adminLessons, /\/api\/admin\/courses/);
+  assert.match(adminLessons, /bunny_video_id/);
+
+  const adminStudents = await readAppFile('admin/students/page.jsx');
+  assert.match(adminStudents, /\/api\/admin\/students/);
+  assert.match(adminStudents, /enrollment_count/);
+
+  const learnPage = await readAppFile('learn/[slug]/page.jsx');
+  assert.match(learnPage, /\/api\/lessons/);
+  assert.match(learnPage, /video-url/);
+  assert.match(learnPage, /signed_url/);
+  assert.match(learnPage, /apiFetch/);
+  assert.match(learnPage, /session_expired/);
+
+  const forgotPage = await readAppFile('forgot-password/page.jsx');
+  assert.match(forgotPage, /forgot-password/);
+  assert.match(forgotPage, /\/api\/auth\/forgot-password/);
+
+  const resetPage = await readAppFile('reset-password/page.jsx');
+  assert.match(resetPage, /reset-password/);
+  assert.match(resetPage, /\/api\/auth\/reset-password/);
+  assert.match(resetPage, /password_confirmation/);
 }

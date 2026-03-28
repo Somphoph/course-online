@@ -143,6 +143,11 @@ export default function DashboardPage() {
                     <p className={styles.courseMeta}>
                       Submitted {new Date(enrolment.created_at).toLocaleDateString('th-TH')}
                     </p>
+                    {enrolment.status === 'approved' && enrolment.course?.slug ? (
+                      <Link href={`/learn/${enrolment.course.slug}`} className={styles.watchLink}>
+                        Watch now →
+                      </Link>
+                    ) : null}
                   </div>
                   <span className={STATUS_CLASSES[enrolment.status] ?? styles.statusPending}>
                     {STATUS_LABELS[enrolment.status] ?? enrolment.status}

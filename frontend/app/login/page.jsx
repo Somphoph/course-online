@@ -194,9 +194,14 @@ function LoginContent() {
           <button className={styles.primaryButton} disabled={loading} type="submit">
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
-          <Link className={styles.inlineLink} href="/register">
-            New here? Register
-          </Link>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <Link className={styles.inlineLink} href="/register">
+              New here? Register
+            </Link>
+            <Link className={styles.inlineLink} href="/forgot-password">
+              Forgot password?
+            </Link>
+          </div>
         </div>
       </form>
     </AuthShell>
