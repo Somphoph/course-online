@@ -110,6 +110,7 @@
   align-content: center;
   gap: 14px;
   padding: 8px 0;
+  overflow: hidden;
 }
 
 .heroPanel::before,

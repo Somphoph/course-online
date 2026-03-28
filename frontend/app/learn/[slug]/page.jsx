@@ -128,7 +128,7 @@ export default function LearnPage({ params }) {
       {/* Top navbar */}
       <header className={styles.navbar}>
         <Link href="/" className={styles.navBrand}>
-          The Academic Editorial
+          Course Online
         </Link>
         <nav className={styles.navLinks}>
           <Link href="/courses" className={styles.navLink}>Browse</Link>
