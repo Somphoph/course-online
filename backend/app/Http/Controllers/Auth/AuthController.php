@@ -97,6 +97,10 @@ class AuthController extends Controller
             }
         );
 
+        if ($status !== Password::PASSWORD_RESET) {
+            return response()->json(['message' => __($status)], 422);
+        }
+
         return response()->json(['status' => $status]);
     }
 }
