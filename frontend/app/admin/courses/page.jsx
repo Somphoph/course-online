@@ -134,29 +134,33 @@ export default function AdminCoursesPage() {
   function CourseForm({ submitLabel }) {
     return (
       <form className={styles.form} onSubmit={handleSave}>
-        <label className={styles.field}>
-          <span className={styles.label}>Title</span>
-          <input className={styles.input} name="title" required value={form.title} onChange={handleChange} />
-        </label>
-        <label className={styles.field}>
-          <span className={styles.label}>Slug</span>
-          <input className={styles.input} name="slug" required value={form.slug} onChange={handleChange} />
-        </label>
-        <label className={styles.field}>
-          <span className={styles.label}>Price (THB)</span>
-          <input className={styles.input} name="price" type="number" min="0" step="0.01" required value={form.price} onChange={handleChange} />
-        </label>
+        <div className={styles.formGrid}>
+          <label className={styles.field}>
+            <span className={styles.label}>Title</span>
+            <input className={styles.input} name="title" required value={form.title} onChange={handleChange} placeholder="Course title" />
+          </label>
+          <label className={styles.field}>
+            <span className={styles.label}>Slug</span>
+            <input className={styles.input} name="slug" required value={form.slug} onChange={handleChange} placeholder="course-slug" />
+          </label>
+        </div>
         <label className={styles.field}>
           <span className={styles.label}>Description</span>
-          <textarea className={styles.textarea} name="description" required value={form.description} onChange={handleChange} rows={3} />
+          <textarea className={styles.textarea} name="description" required value={form.description} onChange={handleChange} rows={3} placeholder="Course description..." />
         </label>
-        <label className={styles.field}>
-          <span className={styles.label}>Thumbnail URL (optional)</span>
-          <input className={styles.input} name="thumbnail" value={form.thumbnail} onChange={handleChange} />
-        </label>
+        <div className={styles.formGrid}>
+          <label className={styles.field}>
+            <span className={styles.label}>Price (THB)</span>
+            <input className={styles.input} name="price" type="number" min="0" step="0.01" required value={form.price} onChange={handleChange} placeholder="0" />
+          </label>
+          <label className={styles.field}>
+            <span className={styles.label}>Thumbnail URL (optional)</span>
+            <input className={styles.input} name="thumbnail" value={form.thumbnail} onChange={handleChange} placeholder="https://..." />
+          </label>
+        </div>
         <label className={styles.checkField}>
           <input type="checkbox" name="is_published" checked={form.is_published} onChange={handleChange} />
-          <span>Published</span>
+          <span>Published — visible to students</span>
         </label>
         <div className={styles.formActions}>
           <button className={styles.saveBtn} type="submit" disabled={saving}>{saving ? 'Saving...' : submitLabel}</button>
@@ -166,57 +170,103 @@ export default function AdminCoursesPage() {
     );
   }
 
+  const published = courses.filter((c) => c.is_published).length;
+  const drafts = courses.length - published;
+
   return (
     <AdminShell>
-      <header className={styles.topbar}>
+      <div className={styles.pageHeader}>
         <div>
-          <p className={styles.topbarLabel}>Courses</p>
-          <h2 className={styles.topbarTitle}>All courses</h2>
+          <p className={styles.pageKicker}>Content</p>
+          <h1 className={styles.pageTitle}>Course Management</h1>
+          <p className={styles.pageDesc}>Create, edit, and manage your course catalog</p>
         </div>
         <button className={styles.createBtn} type="button" onClick={openCreate}>
-          + New course
+          + New Course
         </button>
-      </header>
+      </div>
+
+      <div className={styles.statsRow}>
+        <div className={styles.statChip}>
+          <span className={styles.statNum}>{courses.length}</span>
+          <span className={styles.statLabel}>Total</span>
+        </div>
+        <div className={`${styles.statChip} ${styles.statChipGreen}`}>
+          <span className={styles.statNum}>{published}</span>
+          <span className={styles.statLabel}>Published</span>
+        </div>
+        <div className={`${styles.statChip} ${styles.statChipAmber}`}>
+          <span className={styles.statNum}>{drafts}</span>
+          <span className={styles.statLabel}>Draft</span>
+        </div>
+      </div>
 
       {showCreate && (
         <div className={styles.formPanel}>
-          <h3 className={styles.formTitle}>Create course</h3>
+          <div className={styles.formPanelHeader}>
+            <h3 className={styles.formTitle}>Create New Course</h3>
+            <button className={styles.closeBtn} type="button" onClick={closeForm} aria-label="Close">✕</button>
+          </div>
           {error ? <p className={styles.formError}>{error}</p> : null}
           <CourseForm submitLabel="Create course" />
         </div>
       )}
 
       {loading ? (
-        <p className={styles.empty}>Loading...</p>
+        <p className={styles.empty}>Loading courses...</p>
       ) : courses.length === 0 ? (
-        <p className={styles.empty}>No courses yet.</p>
+        <div className={styles.emptyWrap}>
+          <p className={styles.emptyTitle}>No courses yet</p>
+          <p className={styles.emptyDesc}>Get started by creating your first course.</p>
+          <button className={styles.createBtn} type="button" onClick={openCreate}>+ New Course</button>
+        </div>
       ) : (
-        <div className={styles.courseList}>
+        <div className={styles.courseGrid}>
           {courses.map((course) => (
             <div key={course.id}>
               {editId === course.id ? (
                 <div className={styles.formPanel}>
-                  <h3 className={styles.formTitle}>Edit course</h3>
+                  <div className={styles.formPanelHeader}>
+                    <h3 className={styles.formTitle}>Edit Course</h3>
+                    <button className={styles.closeBtn} type="button" onClick={closeForm} aria-label="Close">✕</button>
+                  </div>
                   {error ? <p className={styles.formError}>{error}</p> : null}
                   <CourseForm submitLabel="Save changes" />
                 </div>
               ) : (
-                <div className={styles.courseRow}>
-                  <div className={styles.courseInfo}>
-                    <p className={styles.courseTitle}>{course.title}</p>
-                    <p className={styles.courseMeta}>
-                      {course.slug} · {Number(course.price).toLocaleString('th-TH')} THB ·{' '}
-                      <span className={course.is_published ? styles.published : styles.draft}>
-                        {course.is_published ? 'Published' : 'Draft'}
-                      </span>
-                    </p>
+                <div className={styles.courseCard}>
+                  <div className={styles.courseThumbnail}>
+                    {course.thumbnail ? (
+                      <img src={course.thumbnail} alt={course.title} className={styles.thumbnailImg} />
+                    ) : (
+                      <div className={styles.thumbnailPlaceholder}>
+                        <span className={styles.thumbnailIcon}>▶</span>
+                      </div>
+                    )}
+                    <span className={course.is_published ? styles.publishedBadge : styles.draftBadge}>
+                      {course.is_published ? 'Published' : 'Draft'}
+                    </span>
                   </div>
-                  <div className={styles.courseActions}>
+                  <div className={styles.courseBody}>
+                    <h3 className={styles.courseTitle}>{course.title}</h3>
+                    {course.description && (
+                      <p className={styles.courseDesc}>{course.description}</p>
+                    )}
+                    <div className={styles.courseMeta}>
+                      <span className={styles.courseSlug}>{course.slug}</span>
+                      <span className={styles.coursePrice}>
+                        {Number(course.price).toLocaleString('th-TH')} THB
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.courseFooter}>
                     <Link href={`/admin/courses/${course.id}/lessons`} className={styles.lessonsLink}>
-                      Lessons
+                      Manage Lessons →
                     </Link>
-                    <button className={styles.editBtn} type="button" onClick={() => openEdit(course)}>Edit</button>
-                    <button className={styles.deleteBtn} type="button" onClick={() => handleDelete(course.id)}>Delete</button>
+                    <div className={styles.courseActions}>
+                      <button className={styles.editBtn} type="button" onClick={() => openEdit(course)}>Edit</button>
+                      <button className={styles.deleteBtn} type="button" onClick={() => handleDelete(course.id)}>Delete</button>
+                    </div>
                   </div>
                 </div>
               )}

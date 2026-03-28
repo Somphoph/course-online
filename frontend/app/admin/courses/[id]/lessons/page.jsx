@@ -143,28 +143,37 @@ export default function AdminLessonsPage({ params }) {
     }
   }
 
+  function formatDuration(seconds) {
+    if (!seconds) return null;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
   function LessonForm({ submitLabel }) {
     return (
       <form className={styles.form} onSubmit={handleSave}>
         <label className={styles.field}>
           <span className={styles.label}>Title</span>
-          <input className={styles.input} name="title" required value={form.title} onChange={handleChange} />
+          <input className={styles.input} name="title" required value={form.title} onChange={handleChange} placeholder="Lesson title" />
         </label>
         <label className={styles.field}>
           <span className={styles.label}>Bunny Video ID</span>
           <input className={styles.input} name="bunny_video_id" required value={form.bunny_video_id} onChange={handleChange} placeholder="e.g. abc123-def456" />
         </label>
-        <label className={styles.field}>
-          <span className={styles.label}>Sort order</span>
-          <input className={styles.input} name="sort_order" type="number" min="0" required value={form.sort_order} onChange={handleChange} />
-        </label>
-        <label className={styles.field}>
-          <span className={styles.label}>Duration (seconds, optional)</span>
-          <input className={styles.input} name="duration_seconds" type="number" min="0" value={form.duration_seconds} onChange={handleChange} />
-        </label>
+        <div className={styles.formRow}>
+          <label className={styles.field}>
+            <span className={styles.label}>Sort Order</span>
+            <input className={styles.input} name="sort_order" type="number" min="0" required value={form.sort_order} onChange={handleChange} placeholder="1" />
+          </label>
+          <label className={styles.field}>
+            <span className={styles.label}>Duration (seconds)</span>
+            <input className={styles.input} name="duration_seconds" type="number" min="0" value={form.duration_seconds} onChange={handleChange} placeholder="Optional" />
+          </label>
+        </div>
         <label className={styles.checkField}>
           <input type="checkbox" name="is_preview" checked={form.is_preview} onChange={handleChange} />
-          <span>Preview lesson (visible without enrollment)</span>
+          <span>Free preview — visible without enrollment</span>
         </label>
         <div className={styles.formActions}>
           <button className={styles.saveBtn} type="submit" disabled={saving}>{saving ? 'Saving...' : submitLabel}</button>
@@ -176,52 +185,72 @@ export default function AdminLessonsPage({ params }) {
 
   return (
     <AdminShell>
-      <header className={styles.topbar}>
+      <div className={styles.pageHeader}>
         <div>
-          <p className={styles.topbarLabel}>
-            <Link href="/admin/courses" className={styles.breadcrumb}>Courses</Link>
-            {' › '}
-            {courseName || `Course #${id}`}
+          <p className={styles.breadcrumbRow}>
+            <Link href="/admin/courses" className={styles.breadcrumbLink}>Courses</Link>
+            <span className={styles.breadcrumbSep}>/</span>
+            <span>{courseName || `Course #${id}`}</span>
           </p>
-          <h2 className={styles.topbarTitle}>Lessons</h2>
+          <h1 className={styles.pageTitle}>Lesson Management</h1>
+          <p className={styles.pageDesc}>
+            {lessons.length} lesson{lessons.length !== 1 ? 's' : ''} in this course
+          </p>
         </div>
         <button className={styles.createBtn} type="button" onClick={openCreate}>
-          + Add lesson
+          + Add Lesson
         </button>
-      </header>
+      </div>
 
       {showCreate && (
         <div className={styles.formPanel}>
-          <h3 className={styles.formTitle}>Add lesson</h3>
+          <div className={styles.formPanelHeader}>
+            <h3 className={styles.formTitle}>Add New Lesson</h3>
+            <button className={styles.closeBtn} type="button" onClick={closeForm} aria-label="Close">✕</button>
+          </div>
           {error ? <p className={styles.formError}>{error}</p> : null}
           <LessonForm submitLabel="Add lesson" />
         </div>
       )}
 
       {loading ? (
-        <p className={styles.empty}>Loading...</p>
+        <p className={styles.empty}>Loading lessons...</p>
       ) : lessons.length === 0 && !showCreate ? (
-        <p className={styles.empty}>No lessons yet. Add the first lesson above.</p>
+        <div className={styles.emptyState}>
+          <p className={styles.emptyTitle}>No lessons yet</p>
+          <p className={styles.emptyDesc}>Add the first lesson to this course.</p>
+        </div>
       ) : (
         <div className={styles.lessonList}>
-          {lessons.map((lesson) => (
+          {lessons.map((lesson, index) => (
             <div key={lesson.id}>
               {editId === lesson.id ? (
                 <div className={styles.formPanel}>
-                  <h3 className={styles.formTitle}>Edit lesson</h3>
+                  <div className={styles.formPanelHeader}>
+                    <h3 className={styles.formTitle}>Edit Lesson</h3>
+                    <button className={styles.closeBtn} type="button" onClick={closeForm} aria-label="Close">✕</button>
+                  </div>
                   {error ? <p className={styles.formError}>{error}</p> : null}
                   <LessonForm submitLabel="Save changes" />
                 </div>
               ) : (
                 <div className={styles.lessonRow}>
-                  <div className={styles.lessonOrder}>#{lesson.sort_order}</div>
+                  <div className={styles.lessonIndex}>{index + 1}</div>
                   <div className={styles.lessonInfo}>
-                    <p className={styles.lessonTitle}>{lesson.title}</p>
-                    <p className={styles.lessonMeta}>
-                      {lesson.bunny_video_id}
-                      {lesson.duration_seconds ? ` · ${lesson.duration_seconds}s` : ''}
-                      {lesson.is_preview ? ' · Preview' : ''}
-                    </p>
+                    <div className={styles.lessonTitleRow}>
+                      <p className={styles.lessonTitle}>{lesson.title}</p>
+                      {lesson.is_preview && (
+                        <span className={styles.previewBadge}>Free Preview</span>
+                      )}
+                    </div>
+                    <div className={styles.lessonDetails}>
+                      <span className={styles.lessonVideoId}>{lesson.bunny_video_id}</span>
+                      {lesson.duration_seconds ? (
+                        <span className={styles.lessonDuration}>
+                          ▶ {formatDuration(lesson.duration_seconds)}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                   <div className={styles.lessonActions}>
                     <button className={styles.editBtn} type="button" onClick={() => openEdit(lesson)}>Edit</button>
@@ -233,6 +262,13 @@ export default function AdminLessonsPage({ params }) {
           ))}
         </div>
       )}
+
+      <div className={styles.proTip}>
+        <p className={styles.proTipTitle}>Bunny.net Video IDs</p>
+        <p className={styles.proTipText}>
+          Enter the Bunny.net video library ID for each lesson. The raw ID is stored securely and never exposed in student-facing API responses.
+        </p>
+      </div>
     </AdminShell>
   );
 }
