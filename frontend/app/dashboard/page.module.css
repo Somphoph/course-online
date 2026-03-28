@@ -194,3 +194,16 @@
     flex-direction: column;
   }
 }
+
+.watchLink {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.watchLink:hover {
+  text-decoration: underline;
+}

@@ -73,4 +73,20 @@ export async function runRouteSmokeTests() {
   const adminStudents = await readAppFile('admin/students/page.jsx');
   assert.match(adminStudents, /\/api\/admin\/students/);
   assert.match(adminStudents, /enrollment_count/);
+
+  const learnPage = await readAppFile('learn/[slug]/page.jsx');
+  assert.match(learnPage, /\/api\/lessons/);
+  assert.match(learnPage, /video-url/);
+  assert.match(learnPage, /signed_url/);
+  assert.match(learnPage, /apiFetch/);
+  assert.match(learnPage, /session_expired/);
+
+  const forgotPage = await readAppFile('forgot-password/page.jsx');
+  assert.match(forgotPage, /forgot-password/);
+  assert.match(forgotPage, /\/api\/auth\/forgot-password/);
+
+  const resetPage = await readAppFile('reset-password/page.jsx');
+  assert.match(resetPage, /reset-password/);
+  assert.match(resetPage, /\/api\/auth\/reset-password/);
+  assert.match(resetPage, /password_confirmation/);
 }
