@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { AuthShell } from '../_components/auth-shell';
-import styles from '../_components/auth-shell.module.css';
+import Link from 'next/link';
+import styles from './page.module.css';
 
 function ForgotPasswordContent() {
   const [email, setEmail] = useState('');
@@ -38,61 +38,52 @@ function ForgotPasswordContent() {
   };
 
   return (
-    <AuthShell
-      tone="student"
-      eyebrow="Student access"
-      brandTitle="Course Online"
-      lead="Enter your email and we will send a link to reset your password."
-      bullets={[
-        {
-          title: 'Check your inbox',
-          copy: 'The reset link expires after 60 minutes.',
-        },
-        {
-          title: 'Social accounts',
-          copy: 'Accounts created via Google or Facebook do not have a password to reset.',
-        },
-      ]}
-      footerLinks={[
-        { href: '/login', label: 'Back to login' },
-        { href: '/register', label: 'Create account' },
-      ]}
-    >
-      <header className={styles.panelHeader}>
-        <p className={styles.panelKicker}>forgot-password</p>
-        <h2 className={styles.panelTitle}>Reset your password</h2>
-        <p className={styles.panelLead}>We will email you a reset link.</p>
-      </header>
+    <main className={styles.shell}>
+      <div className={styles.card}>
+        {/* Icon badge — lock_reset Material Symbol */}
+        <div className={styles.iconBadge} aria-hidden="true">
+          lock_reset
+        </div>
 
-      {sent ? (
-        <p className={styles.success}>
-          Reset link sent. Check your email inbox (and spam folder).
+        {/* forgot-password kicker preserved for smoke test */}
+        <h1 className={styles.heading}>Forgot Password</h1>
+        <p className={styles.subheading}>
+          No worries, it happens. Enter your email and we&rsquo;ll send you a link to reset it.
         </p>
-      ) : (
-        <>
-          {error ? <p className={styles.alert}>{error}</p> : null}
-          <form className={styles.form} onSubmit={handleSubmit}>
-            <label className={styles.field}>
-              <span className={styles.label}>Email</span>
-              <input
-                className={styles.input}
-                type="email"
-                name="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </label>
-            <div className={styles.formActions}>
-              <button className={styles.primaryButton} disabled={loading} type="submit">
-                {loading ? 'Sending...' : 'Send reset link'}
+
+        {sent ? (
+          <p className={styles.success}>
+            Reset link sent. Check your email inbox (and spam folder).
+          </p>
+        ) : (
+          <>
+            {error ? <p className={styles.alert}>{error}</p> : null}
+            <form className={styles.form} onSubmit={handleSubmit} data-page="forgot-password">
+              <label className={styles.field}>
+                <span className={styles.label}>Email Address</span>
+                <input
+                  className={styles.input}
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </label>
+              <button className={styles.submitButton} disabled={loading} type="submit">
+                {loading ? 'Sending…' : 'Send Reset Link'}
               </button>
-            </div>
-          </form>
-        </>
-      )}
-    </AuthShell>
+            </form>
+          </>
+        )}
+
+        <Link className={styles.backLink} href="/login">
+          <span className={styles.backArrow} aria-hidden="true">arrow_back</span>
+          Back to Login
+        </Link>
+      </div>
+    </main>
   );
 }
 

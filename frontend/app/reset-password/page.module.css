@@ -1,0 +1,222 @@
+/* Reset Password page — single-column centered card layout */
+
+.shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+  background:
+    radial-gradient(circle at top left, rgba(0, 82, 174, 0.10), transparent 38%),
+    radial-gradient(circle at 80% 80%, rgba(0, 106, 220, 0.08), transparent 32%),
+    linear-gradient(160deg, #f7f8ff 0%, #f9f9ff 56%, #f4f7ff 100%);
+  color: #191c22;
+}
+
+.card {
+  width: min(100%, 440px);
+  padding: 40px 36px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 2px 4px rgba(25, 28, 34, 0.04),
+    0 20px 48px rgba(25, 28, 34, 0.10);
+}
+
+.heading {
+  margin: 0 0 8px;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  font-family: Manrope, Inter, ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.15;
+  color: #191c22;
+}
+
+.subheading {
+  margin: 0 0 28px;
+  font-size: 0.96rem;
+  line-height: 1.6;
+  color: rgba(25, 28, 34, 0.72);
+}
+
+/* Alert / success banners */
+.alert,
+.success {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+.alert {
+  background: rgba(220, 38, 38, 0.08);
+  color: #9f1239;
+}
+
+.success {
+  background: rgba(16, 185, 129, 0.10);
+  color: #0f766e;
+}
+
+/* Form */
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+.label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(25, 28, 34, 0.80);
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  min-height: 50px;
+  padding: 0 48px 0 16px;
+  border: 1.5px solid rgba(25, 28, 34, 0.10);
+  border-radius: 14px;
+  background: rgba(25, 28, 34, 0.03);
+  color: #191c22;
+  font: inherit;
+  font-size: 0.97rem;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.input:focus {
+  border-color: rgba(0, 82, 174, 0.50);
+  box-shadow: 0 0 0 3px rgba(0, 106, 220, 0.12);
+  background: #fff;
+}
+
+.input::placeholder {
+  color: rgba(25, 28, 34, 0.38);
+}
+
+.eyeButton {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(25, 28, 34, 0.48);
+  font-family: 'Material Symbols Outlined', sans-serif;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  font-size: 1.2rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: color 160ms ease;
+}
+
+.eyeButton:hover {
+  color: rgba(25, 28, 34, 0.80);
+}
+
+/* Password requirements checklist */
+.requirements {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.reqItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: rgba(25, 28, 34, 0.60);
+  transition: color 160ms ease;
+}
+
+.reqItem.met {
+  color: #0f766e;
+}
+
+.reqDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(25, 28, 34, 0.18);
+  flex-shrink: 0;
+  transition: background 160ms ease;
+}
+
+.reqItem.met .reqDot {
+  background: #10b981;
+}
+
+.submitButton {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0052ae, #006adc);
+  color: #fff;
+  font: inherit;
+  font-size: 0.97rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 106, 220, 0.22);
+  transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+  margin-top: 4px;
+}
+
+.submitButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 106, 220, 0.28);
+}
+
+.submitButton:disabled {
+  cursor: wait;
+  opacity: 0.68;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Back to login link */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 24px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #0052ae;
+  text-decoration: none;
+  transition: opacity 160ms ease;
+}
+
+.backLink:hover {
+  opacity: 0.80;
+}
+
+.backArrow {
+  font-family: 'Material Symbols Outlined', sans-serif;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 28px 20px;
+    border-radius: 20px;
+  }
+}
