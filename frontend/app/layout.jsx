@@ -1,5 +1,7 @@
 import './globals.css';
 import Navbar from './_components/navbar';
+import Footer from './_components/footer';
+import PageWrapper from './_components/page-wrapper';
 
 export const metadata = {
   title: 'Course Online',
@@ -19,7 +21,8 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <Navbar />
-        <div>{children}</div>
+        <PageWrapper>{children}</PageWrapper>
+        <Footer />
       </body>
     </html>
   );

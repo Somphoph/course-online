@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import styles from './page.module.css';
 
 export default function HomePage() {
   const [courses, setCourses] = useState([]);
@@ -14,7 +13,8 @@ export default function HomePage() {
     fetch('/api/courses', { headers: { Accept: 'application/json' } })
       .then((res) => res.json())
       .then((payload) => {
-        setCourses(payload.data ?? payload);
+        const data = payload.data ?? payload;
+        setCourses(Array.isArray(data) ? data : []);
       })
       .catch(() => {
         setCourses([]);
@@ -25,106 +25,202 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className={styles.shell}>
-      <section className={styles.hero}>
-        <header className={styles.header}>
-          <div className={styles.brandRow}>
-            <span className={styles.brandMark} />
-            <p className={styles.kicker}>Course Online</p>
-          </div>
-          <h1 className={styles.title}>Learn at your own pace</h1>
-          <p className={styles.lead}>
-            Courses covering Microsoft Excel, MS Access, Power Automate, and App Sheet.
-            Browse below and enrol when you&apos;re ready.
-          </p>
-          <div className={styles.heroActions}>
-            <a href="#courses" className={styles.ctaBtn}>
-              View all courses →
-            </a>
-            <p className={styles.heroMeta}>
-              Self-paced lessons, clear pricing, and a direct handoff into checkout.
+    <div
+      className="min-h-screen px-5 md:px-8 lg:px-12 pb-14"
+      style={{
+        background:
+          'radial-gradient(circle at top left, rgba(0,106,220,0.08), transparent 28%), radial-gradient(circle at 82% 16%, rgba(16,185,129,0.08), transparent 24%), linear-gradient(180deg,#f9f9ff 0%,#f8f8ff 100%)',
+      }}
+    >
+      {/* Hero Section */}
+      <section className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-stretch min-h-[min(78vh,820px)] pt-4">
+        {/* Left — headline + CTA */}
+        <header className="flex flex-col justify-center max-w-2xl py-6 lg:py-11">
+          {/* Brand pill */}
+          <div className="inline-flex items-center gap-3 mb-5">
+            <span
+              className="w-4 h-4 rounded-full shrink-0 shadow-lg"
+              style={{ background: 'linear-gradient(135deg,#0052ae,#006adc)', boxShadow: '0 12px 24px rgba(0,106,220,0.18)' }}
+              aria-hidden="true"
+            />
+            <p className="m-0 text-xs tracking-widest uppercase text-on-surface/55 font-body">
+              Course Online
             </p>
+          </div>
+
+          <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-extrabold text-on-surface leading-[0.97] tracking-tighter mb-4">
+            Learn at your own pace
+          </h1>
+
+          <p className="text-base lg:text-lg text-on-surface-variant leading-relaxed max-w-[42ch] mb-6">
+            Courses covering Microsoft Excel, MS Access, Power Automate, and App
+            Sheet. Browse below and enrol when you&apos;re ready.
+          </p>
+
+          <div className="flex flex-wrap gap-4 mt-2">
+            <a
+              href="#courses"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-bold text-lg no-underline shadow-xl hover:shadow-2xl transition-all"
+              style={{ background: 'linear-gradient(135deg,#0052ae,#006adc)' }}
+            >
+              View all courses
+            </a>
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg no-underline transition-all bg-surface-container-highest text-on-primary-fixed-variant hover:bg-surface-container-high"
+            >
+              Get started free
+            </Link>
           </div>
         </header>
 
-        <aside className={styles.heroPanel} aria-label="Featured course preview">
+        {/* Right — featured course card */}
+        <aside className="relative grid content-center gap-3.5 py-2 overflow-hidden" aria-label="Featured course preview">
           {loading ? (
-            <div className={styles.heroLoading}>
-              <div className={styles.spinner} aria-hidden="true" />
-              <p>Loading courses...</p>
+            <div className="relative z-10 grid place-items-center gap-3.5 min-h-[560px] rounded-[28px] text-on-surface/55"
+              style={{ background: 'rgba(255,255,255,0.62)', boxShadow: '0 20px 40px rgba(25,28,34,0.05)' }}>
+              <div
+                className="w-8 h-8 rounded-full border-[3px] animate-spin"
+                style={{ borderColor: 'rgba(0,106,220,0.18)', borderTopColor: '#006adc' }}
+                aria-hidden="true"
+              />
+              <p className="m-0">Loading courses...</p>
             </div>
           ) : featuredCourse ? (
-            <Link href={`/courses/${featuredCourse.slug}`} className={styles.featuredCard}>
-              <div className={styles.featuredMedia}>
+            <Link
+              href={`/courses/${featuredCourse.slug}`}
+              className="relative z-10 grid overflow-hidden no-underline text-inherit transition-all hover:-translate-y-0.5"
+              style={{
+                gridTemplateRows: 'minmax(240px,1fr) auto',
+                minHeight: '560px',
+                borderRadius: '28px',
+                background: 'rgba(255,255,255,0.84)',
+                boxShadow: '0 20px 40px rgba(25,28,34,0.08)',
+              }}
+            >
+              {/* Thumbnail */}
+              <div
+                className="relative"
+                style={{ background: 'linear-gradient(180deg,rgba(0,106,220,0.08),rgba(16,185,129,0.06)),#eef3ff' }}
+              >
                 {featuredCourse.thumbnail ? (
                   <img
-                    className={styles.featuredImage}
+                    className="w-full h-full object-cover block"
                     src={featuredCourse.thumbnail}
                     alt={featuredCourse.title}
                   />
                 ) : (
-                  <div className={styles.featuredImage} role="presentation" />
+                  <div className="w-full h-full" style={{ background: 'rgba(0,106,220,0.06)' }} role="presentation" />
                 )}
               </div>
-              <div className={styles.featuredBody}>
-                <p className={styles.featuredKicker}>Featured course</p>
-                <h2 className={styles.featuredTitle}>{featuredCourse.title}</h2>
-                <p className={styles.featuredDesc}>{featuredCourse.description}</p>
-                <div className={styles.featuredFooter}>
-                  <span className={styles.priceTag}>
+
+              {/* Body */}
+              <div className="grid gap-2.5 px-5 py-5">
+                <p className="m-0 text-[0.72rem] tracking-widest uppercase text-on-surface/44">
+                  Featured course
+                </p>
+                <h2 className="m-0 font-headline text-[1.7rem] font-bold leading-tight tracking-tight text-on-surface">
+                  {featuredCourse.title}
+                </h2>
+                <p className="m-0 max-w-[34ch] text-on-surface/68 leading-relaxed">
+                  {featuredCourse.description}
+                </p>
+                <div className="flex items-center justify-between gap-3 mt-2.5">
+                  <span className="font-bold text-primary-container">
                     {Number(featuredCourse.price).toLocaleString('th-TH')} THB
                   </span>
-                  <span className={styles.featuredLink}>Open course</span>
+                  <span className="font-semibold text-on-surface/78">Open course</span>
                 </div>
               </div>
             </Link>
           ) : (
-            <div className={styles.heroLoading}>
-              <p>No courses available yet. Check back soon.</p>
+            <div
+              className="relative z-10 grid place-items-center min-h-[560px] rounded-[28px] text-on-surface/55"
+              style={{ background: 'rgba(255,255,255,0.62)', boxShadow: '0 20px 40px rgba(25,28,34,0.05)' }}
+            >
+              <p className="m-0">No courses available yet. Check back soon.</p>
             </div>
           )}
 
-          <div className={styles.heroNotes}>
-            <article className={styles.noteCard}>
-              <p className={styles.noteLabel}>Format</p>
-              <p className={styles.noteBody}>Self-paced lessons with practical assignments.</p>
+          {/* Note cards */}
+          <div className="relative z-10 grid grid-cols-2 gap-3">
+            <article
+              className="px-4 py-4 rounded-[18px]"
+              style={{ background: 'rgba(255,255,255,0.58)', boxShadow: '0 20px 40px rgba(25,28,34,0.05)' }}
+            >
+              <p className="m-0 text-[0.74rem] tracking-widest uppercase text-on-surface/46">Format</p>
+              <p className="mt-2 mb-0 text-on-surface/72 leading-snug">
+                Self-paced lessons with practical assignments.
+              </p>
             </article>
-            <article className={styles.noteCard}>
-              <p className={styles.noteLabel}>Support</p>
-              <p className={styles.noteBody}>Straightforward checkout and dashboard handoff.</p>
+            <article
+              className="px-4 py-4 rounded-[18px]"
+              style={{ background: 'rgba(255,255,255,0.58)', boxShadow: '0 20px 40px rgba(25,28,34,0.05)' }}
+            >
+              <p className="m-0 text-[0.74rem] tracking-widest uppercase text-on-surface/46">Support</p>
+              <p className="mt-2 mb-0 text-on-surface/72 leading-snug">
+                Straightforward checkout and dashboard handoff.
+              </p>
             </article>
           </div>
         </aside>
       </section>
 
-      <section id="courses" className={styles.catalog}>
-        <div className={styles.catalogHeader}>
+      {/* Course Catalog Section */}
+      <section id="courses" className="mt-7 grid gap-5">
+        {/* Catalog header */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
-            <p className={styles.catalogKicker}>Course catalog</p>
-            <h2 className={styles.catalogTitle}>Browse by topic</h2>
+            <p className="m-0 mb-1 text-[0.75rem] tracking-widest uppercase text-on-surface/46">
+              Course catalog
+            </p>
+            <h2 className="m-0 font-headline text-2xl lg:text-[2.2rem] font-bold leading-tight tracking-tight text-on-surface">
+              Browse by topic
+            </h2>
           </div>
-          <p className={styles.catalogLead}>
-            The page keeps one featured course up top, then surfaces the remaining courses below.
+          <p className="m-0 max-w-[42ch] text-on-surface/58 leading-relaxed">
+            The page keeps one featured course up top, then surfaces the remaining
+            courses below.
           </p>
         </div>
 
+        {/* Cards grid */}
         {!loading && supportingCourses.length > 0 ? (
-          <div className={styles.grid}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {supportingCourses.map((course) => (
-              <Link key={course.slug} href={`/courses/${course.slug}`} className={styles.card}>
+              <Link
+                key={course.slug}
+                href={`/courses/${course.slug}`}
+                className="group flex flex-col bg-white rounded-2xl overflow-hidden no-underline text-inherit transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+                style={{ boxShadow: '0 12px 32px rgba(25,28,34,0.06)' }}
+              >
+                {/* Card thumbnail */}
                 {course.thumbnail ? (
                   <img
-                    className={styles.cardThumbnail}
+                    className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500"
                     src={course.thumbnail}
                     alt={course.title}
                   />
                 ) : (
-                  <div className={styles.cardThumbnail} role="presentation" />
+                  <div
+                    className="w-full aspect-video"
+                    style={{
+                      background:
+                        'linear-gradient(180deg,rgba(0,106,220,0.1),rgba(16,185,129,0.06)),rgba(255,255,255,0.6)',
+                    }}
+                    role="presentation"
+                  />
                 )}
-                <div className={styles.cardBody}>
-                  <p className={styles.cardTitle}>{course.title}</p>
-                  <p className={styles.cardDesc}>{course.description}</p>
-                  <p className={styles.cardPrice}>
+
+                {/* Card body */}
+                <div className="flex flex-col flex-1 gap-2 p-5">
+                  <p className="m-0 font-headline font-bold text-[1.05rem] text-on-surface group-hover:text-primary transition-colors leading-tight">
+                    {course.title}
+                  </p>
+                  <p className="m-0 text-[0.92rem] leading-snug text-on-surface/68 flex-1 line-clamp-3">
+                    {course.description}
+                  </p>
+                  <p className="mt-1 mb-0 font-bold text-primary-container">
                     {Number(course.price).toLocaleString('th-TH')} THB
                   </p>
                 </div>
@@ -133,6 +229,7 @@ export default function HomePage() {
           </div>
         ) : null}
       </section>
+
     </div>
   );
 }

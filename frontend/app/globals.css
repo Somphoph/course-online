@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   color-scheme: light;
   --page-bg: #f9f9ff;
@@ -50,4 +54,155 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+@layer components {
+  .editorial-gradient {
+    background: linear-gradient(135deg, #0052ae 0%, #006adc 100%);
+  }
+
+  .page-shell {
+    @apply min-h-screen bg-background text-on-surface font-body;
+  }
+
+  .surface-panel {
+    @apply rounded-[28px] border bg-white shadow-[0_20px_40px_rgba(25,28,34,0.08)];
+    border-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
+  .surface-panel-soft {
+    @apply rounded-3xl border bg-white shadow-[0_8px_28px_rgba(25,28,34,0.06)];
+    border-color: rgba(25, 28, 34, 0.08);
+    background-color: rgba(255, 255, 255, 0.92);
+  }
+
+  .surface-card {
+    @apply rounded-2xl border bg-white shadow-sm;
+    border-color: rgba(193, 198, 214, 0.3);
+  }
+
+  .section-kicker {
+    @apply m-0 text-[0.78rem] font-semibold uppercase tracking-[0.12em];
+    color: rgba(25, 28, 34, 0.55);
+  }
+
+  .section-title {
+    @apply m-0 font-headline font-extrabold leading-none tracking-tight text-on-surface;
+  }
+
+  .section-copy {
+    @apply m-0 leading-relaxed;
+    color: rgba(25, 28, 34, 0.72);
+  }
+
+  .status-banner-error {
+    @apply rounded-2xl border border-red-200 bg-red-50 px-4 py-3.5 text-sm leading-snug text-rose-800;
+  }
+
+  .status-banner-success {
+    @apply rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-sm leading-snug text-teal-700;
+  }
+
+  .chip-link {
+    @apply inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold no-underline transition-transform hover:-translate-y-px;
+    background-color: rgba(25, 28, 34, 0.06);
+    color: rgba(25, 28, 34, 0.78);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full px-6 text-sm font-semibold text-white transition hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60;
+    background: linear-gradient(135deg, #0052ae 0%, #006adc 100%);
+    box-shadow: 0 18px 30px rgba(0, 106, 220, 0.18);
+  }
+
+  .btn-primary-admin {
+    @apply inline-flex items-center justify-center rounded-full px-6 text-sm font-semibold text-white transition hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60;
+    background: linear-gradient(135deg, #312e81 0%, #4338ca 100%);
+    box-shadow: 0 18px 30px rgba(67, 56, 202, 0.18);
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-full px-5 text-sm font-medium text-on-surface transition;
+    background-color: rgba(25, 28, 34, 0.06);
+  }
+
+  .btn-ghost:hover {
+    background-color: rgba(25, 28, 34, 0.1);
+  }
+
+  .btn-social {
+    @apply inline-flex min-h-[50px] w-full items-center justify-center gap-3 rounded-2xl border-0 font-semibold text-on-surface transition-transform hover:-translate-y-px disabled:cursor-wait disabled:opacity-70;
+    background-color: rgba(25, 28, 34, 0.04);
+  }
+
+  .auth-loading-shell {
+    @apply grid min-h-screen place-items-center bg-background p-8;
+  }
+
+  .auth-loading-card {
+    @apply surface-panel w-full max-w-[480px] p-7 text-center;
+  }
+
+  .spinner-ring {
+    @apply mx-auto h-10 w-10 animate-spin rounded-full border-[3px];
+  }
+
+  .form-grid {
+    @apply grid gap-4;
+  }
+
+  .field-grid {
+    @apply grid gap-2;
+  }
+
+  .field-label {
+    @apply text-[0.9rem] font-semibold;
+    color: rgba(25, 28, 34, 0.82);
+  }
+
+  .field-label-caps {
+    @apply text-[0.78rem] font-semibold uppercase tracking-[0.08em];
+    color: rgba(25, 28, 34, 0.58);
+  }
+
+  .field-input {
+    @apply min-h-[52px] rounded-2xl border-0 px-4 text-on-surface outline-none transition-shadow focus:shadow-[0_0_0_4px_rgba(0,106,220,0.14)];
+    background-color: rgba(25, 28, 34, 0.05);
+  }
+
+  .field-input:focus {
+    background-color: rgba(255, 255, 255, 0.92);
+  }
+
+  .field-input-outline {
+    @apply min-h-11 rounded-2xl border bg-white px-4 text-sm text-on-surface outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10;
+    border-color: rgba(25, 28, 34, 0.15);
+  }
+
+  .auth-divider {
+    @apply my-4 grid items-center gap-3 text-sm;
+    grid-template-columns: 1fr auto 1fr;
+    color: rgba(25, 28, 34, 0.54);
+  }
+
+  .auth-divider::before,
+  .auth-divider::after {
+    content: '';
+    @apply block h-px;
+    background-color: rgba(25, 28, 34, 0.08);
+  }
+
+  .admin-sidebar-link {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200;
+  }
+
+  .admin-sidebar-link-active {
+    @apply border-l-4 border-primary pl-2 font-semibold text-primary;
+    background-color: rgba(0, 106, 220, 0.1);
+  }
+
+  .admin-sidebar-link-idle {
+    @apply text-on-surface-variant hover:bg-surface-container hover:text-on-surface;
+  }
 }
