@@ -18,6 +18,7 @@ class Course extends Model
         'price',
         'slug',
         'is_published',
+        'level',
     ];
 
     protected function casts(): array
