@@ -26,6 +26,7 @@ class CourseFactory extends Factory
             'price' => fake()->randomElement([990, 1490, 1990]),
             'slug' => Str::slug($title).'-'.fake()->unique()->numberBetween(1, 9999),
             'is_published' => true,
+            'level' => fake()->randomElement(['Beginner', 'Intermediate', 'Advanced']),
         ];
     }
 

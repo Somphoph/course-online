@@ -20,6 +20,7 @@ class StoreCourseRequest extends FormRequest
             'price' => ['required', 'numeric', 'min:0'],
             'slug' => ['required', 'string', 'unique:courses,slug'],
             'is_published' => ['boolean'],
+            'level' => ['required', 'string', 'in:Beginner,Intermediate,Advanced'],
         ];
     }
 }

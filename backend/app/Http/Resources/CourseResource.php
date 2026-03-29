@@ -17,6 +17,7 @@ class CourseResource extends JsonResource
             'price' => $this->price,
             'slug' => $this->slug,
             'is_published' => $this->is_published,
+            'level' => $this->level,
         ];
     }
 }

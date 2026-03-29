@@ -27,6 +27,7 @@ class UpdateCourseRequest extends FormRequest
                 Rule::unique('courses', 'slug')->ignore($course),
             ],
             'is_published' => ['sometimes', 'boolean'],
+            'level' => ['sometimes', 'string', 'in:Beginner,Intermediate,Advanced'],
         ];
     }
 }
