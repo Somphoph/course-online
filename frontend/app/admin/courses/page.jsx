@@ -294,6 +294,11 @@ export default function AdminCoursesPage() {
                   }`}>
                     {course.is_published ? 'Published' : 'Draft'}
                   </span>
+                  {course.level && (
+                    <span className="rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-500">
+                      {course.level}
+                    </span>
+                  )}
                   <h3 className="font-headline font-bold text-xl text-on-surface truncate">{course.title}</h3>
                 </div>
                 {course.description && (
