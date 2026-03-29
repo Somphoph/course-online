@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import styles from './page.module.css';
 
 function ForgotPasswordContent() {
   const [email, setEmail] = useState('');
@@ -38,50 +37,72 @@ function ForgotPasswordContent() {
   };
 
   return (
-    <main className={styles.shell}>
-      <div className={styles.card}>
-        {/* Icon badge — lock_reset Material Symbol */}
-        <div className={styles.iconBadge} aria-hidden="true">
-          lock_reset
+    <main className="page-shell flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-md">
+        <div className="surface-panel p-8 md:p-12">
+          <div className="mb-8 flex justify-center" aria-hidden="true">
+            <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center text-primary text-3xl font-body">
+              &#x1F512;
+            </div>
+          </div>
+
+          <div className="text-center mb-10">
+            <h1 className="section-title mb-4 text-3xl font-bold">
+              Forgot Password
+            </h1>
+            <p className="section-copy">
+              No worries, it happens. Enter your email and we&rsquo;ll send you a link to reset it.
+            </p>
+          </div>
+
+          {sent ? (
+            <p className="status-banner-success text-center">
+              Reset link sent. Check your email inbox (and spam folder).
+            </p>
+          ) : (
+            <>
+              {error ? (
+                <p className="status-banner-error mb-6">
+                  {error}
+                </p>
+              ) : null}
+              <form className="space-y-6" onSubmit={handleSubmit} data-page="forgot-password">
+                <div className="field-grid">
+                  <label className="field-label ml-1 block text-on-surface-variant" htmlFor="fp-email">
+                    Email Address
+                  </label>
+                  <input
+                    id="fp-email"
+                    className="field-input w-full placeholder:text-outline/60"
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <button
+                  className="btn-primary w-full py-4"
+                  type="submit"
+                  disabled={loading}
+                >
+                  {loading ? 'Sending…' : 'Send Reset Link'}
+                </button>
+              </form>
+            </>
+          )}
+
+          <div className="mt-8 text-center">
+            <Link
+              className="inline-flex items-center gap-2 text-primary font-semibold font-body no-underline hover:text-primary-container transition-colors"
+              href="/login"
+            >
+              <span aria-hidden="true" className="text-lg leading-none">&larr;</span>
+              Back to Login
+            </Link>
+          </div>
         </div>
-
-        {/* forgot-password kicker preserved for smoke test */}
-        <h1 className={styles.heading}>Forgot Password</h1>
-        <p className={styles.subheading}>
-          No worries, it happens. Enter your email and we&rsquo;ll send you a link to reset it.
-        </p>
-
-        {sent ? (
-          <p className={styles.success}>
-            Reset link sent. Check your email inbox (and spam folder).
-          </p>
-        ) : (
-          <>
-            {error ? <p className={styles.alert}>{error}</p> : null}
-            <form className={styles.form} onSubmit={handleSubmit} data-page="forgot-password">
-              <label className={styles.field}>
-                <span className={styles.label}>Email Address</span>
-                <input
-                  className={styles.input}
-                  type="email"
-                  name="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </label>
-              <button className={styles.submitButton} disabled={loading} type="submit">
-                {loading ? 'Sending…' : 'Send Reset Link'}
-              </button>
-            </form>
-          </>
-        )}
-
-        <Link className={styles.backLink} href="/login">
-          <span className={styles.backArrow} aria-hidden="true">arrow_back</span>
-          Back to Login
-        </Link>
       </div>
     </main>
   );

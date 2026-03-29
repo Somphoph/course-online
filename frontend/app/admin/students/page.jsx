@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { apiFetch } from '../../_components/api';
 import AdminShell from '../admin-shell';
-import styles from './page.module.css';
 
 export default function AdminStudentsPage() {
   const [students, setStudents] = useState([]);
@@ -29,26 +28,44 @@ export default function AdminStudentsPage() {
 
   return (
     <AdminShell>
-      <div className={styles.pageHeader}>
+      {/* Page Header */}
+      <div className="flex items-start justify-between gap-5 mb-8">
         <div>
-          <p className={styles.pageKicker}>Community</p>
-          <h1 className={styles.pageTitle}>Student List</h1>
-          <p className={styles.pageDesc}>Manage registered students and their enrollments</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">
+            Community
+          </p>
+          <h1 className="font-headline font-extrabold text-3xl text-on-surface tracking-tight">
+            Student List
+          </h1>
+          <p className="text-on-surface-variant mt-1">
+            Manage registered students and their enrollments
+          </p>
         </div>
       </div>
 
-      <div className={styles.statsRow}>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Total Students</p>
-          <p className={styles.statValue}>{loading ? '—' : students.length.toLocaleString()}</p>
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-xl p-6 shadow-sm hover:-translate-y-0.5 transition-transform">
+          <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+            Total Students
+          </p>
+          <p className="font-headline font-extrabold text-4xl text-on-surface">
+            {loading ? '—' : students.length.toLocaleString()}
+          </p>
         </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Total Enrollments</p>
-          <p className={styles.statValue}>{loading ? '—' : totalEnrollments.toLocaleString()}</p>
+        <div className="bg-white rounded-xl p-6 shadow-sm hover:-translate-y-0.5 transition-transform">
+          <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+            Total Enrollments
+          </p>
+          <p className="font-headline font-extrabold text-4xl text-on-surface">
+            {loading ? '—' : totalEnrollments.toLocaleString()}
+          </p>
         </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Avg. Enrollments</p>
-          <p className={styles.statValue}>
+        <div className="bg-white rounded-xl p-6 shadow-sm hover:-translate-y-0.5 transition-transform">
+          <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+            Avg. Enrollments
+          </p>
+          <p className="font-headline font-extrabold text-4xl text-on-surface">
             {loading || students.length === 0
               ? '—'
               : (totalEnrollments / students.length).toFixed(1)}
@@ -56,89 +73,114 @@ export default function AdminStudentsPage() {
         </div>
       </div>
 
+      {/* Table */}
       {loading ? (
-        <p className={styles.empty}>Loading students...</p>
+        <p className="text-on-surface-variant text-sm py-10">Loading students...</p>
       ) : students.length === 0 ? (
-        <div className={styles.emptyState}>
-          <p className={styles.emptyTitle}>No students yet</p>
-          <p className={styles.emptyDesc}>Students will appear here once they register.</p>
+        <div className="py-20 text-center">
+          <p className="font-headline font-bold text-lg text-on-surface mb-1">No students yet</p>
+          <p className="text-sm text-on-surface-variant">
+            Students will appear here once they register.
+          </p>
         </div>
       ) : (
-        <div className={styles.tableSection}>
-          <div className={styles.tableHeader}>
-            <h2 className={styles.tableTitle}>All Students</h2>
-            <span className={styles.countChip}>{students.length} total</span>
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          {/* Table Header */}
+          <div className="flex items-center justify-between px-6 py-5 border-b border-outline-variant/30">
+            <h2 className="font-headline font-bold text-lg text-on-surface">All Students</h2>
+            <span className="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant text-xs font-medium">
+              {students.length} total
+            </span>
           </div>
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr>
-                  <th className={styles.th}>Student</th>
-                  <th className={styles.th}>Phone</th>
-                  <th className={styles.th}>Registered</th>
-                  <th className={styles.th}>Enrollments</th>
-                  <th className={styles.th}></th>
+                <tr className="border-b border-outline-variant/30 bg-surface-container/30">
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-widest text-on-surface-variant whitespace-nowrap">
+                    Student
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-widest text-on-surface-variant whitespace-nowrap">
+                    Phone
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-widest text-on-surface-variant whitespace-nowrap">
+                    Registered
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-widest text-on-surface-variant whitespace-nowrap">
+                    Enrollments
+                  </th>
+                  <th className="px-6 py-4 w-10"></th>
                 </tr>
               </thead>
               <tbody>
                 {students.map((student) => (
-                  <>
+                  <React.Fragment key={student.id}>
                     <tr
-                      key={student.id}
-                      className={`${styles.tr} ${expandedId === student.id ? styles.trExpanded : ''}`}
+                      className={`cursor-pointer transition-colors border-t border-outline-variant/20 ${
+                        expandedId === student.id
+                          ? 'bg-primary/5'
+                          : 'hover:bg-surface-container/30'
+                      }`}
                       onClick={() => toggleExpand(student.id)}
                     >
-                      <td className={styles.td}>
-                        <div className={styles.studentCell}>
-                          <div className={styles.avatar}>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary-container text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
                             {(student.name ?? '?')[0].toUpperCase()}
                           </div>
                           <div>
-                            <p className={styles.studentName}>{student.name}</p>
-                            <p className={styles.studentEmail}>{student.email}</p>
+                            <p className="text-sm font-semibold text-on-surface">{student.name}</p>
+                            <p className="text-xs text-on-surface-variant">{student.email}</p>
                           </div>
                         </div>
                       </td>
-                      <td className={styles.td}>
-                        <p className={styles.phoneText}>{student.phone ?? '—'}</p>
+                      <td className="px-6 py-4 text-sm text-on-surface-variant">
+                        {student.phone ?? '—'}
                       </td>
-                      <td className={styles.td}>
-                        <p className={styles.dateText}>
-                          {new Date(student.created_at).toLocaleDateString('th-TH')}
-                        </p>
+                      <td className="px-6 py-4 text-sm text-on-surface-variant whitespace-nowrap">
+                        {new Date(student.created_at).toLocaleDateString('th-TH')}
                       </td>
-                      <td className={styles.td}>
-                        <span className={`${styles.enrollBadge} ${student.enrollment_count > 0 ? styles.enrollBadgeActive : ''}`}>
-                          {student.enrollment_count} enrolment{student.enrollment_count !== 1 ? 's' : ''}
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                            student.enrollment_count > 0
+                              ? 'bg-primary/10 text-primary'
+                              : 'bg-surface-container text-on-surface-variant'
+                          }`}
+                        >
+                          {student.enrollment_count} enrolment
+                          {student.enrollment_count !== 1 ? 's' : ''}
                         </span>
                       </td>
-                      <td className={styles.td}>
-                        <span className={styles.expandIcon}>
+                      <td className="px-6 py-4 text-center">
+                        <span className="text-xs text-on-surface-variant">
                           {expandedId === student.id ? '▲' : '▼'}
                         </span>
                       </td>
                     </tr>
                     {expandedId === student.id && (
-                      <tr key={`${student.id}-expanded`} className={styles.expandedRow}>
-                        <td colSpan={5} className={styles.expandedCell}>
-                          <div className={styles.expandedContent}>
-                            <p className={styles.expandedLabel}>Student ID: #{student.id}</p>
-                            <p className={styles.expandedText}>
-                              {student.enrollment_count === 0
-                                ? 'This student has no active enrollments.'
-                                : `${student.enrollment_count} course enrolment${student.enrollment_count !== 1 ? 's' : ''} on record.`}
-                            </p>
-                          </div>
+                      <tr className="bg-primary/3 border-t border-primary/10">
+                        <td colSpan={5} className="px-10 py-4 pl-20">
+                          <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">
+                            Student ID: #{student.id}
+                          </p>
+                          <p className="text-sm text-on-surface-variant">
+                            {student.enrollment_count === 0
+                              ? 'This student has no active enrollments.'
+                              : `${student.enrollment_count} course enrolment${student.enrollment_count !== 1 ? 's' : ''} on record.`}
+                          </p>
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
           </div>
-          <div className={styles.tableFooter}>
-            <p className={styles.footerText}>
+
+          {/* Table Footer */}
+          <div className="px-6 py-4 border-t border-outline-variant/30 bg-surface-container/20">
+            <p className="text-sm text-on-surface-variant">
               Showing {students.length} of {students.length} students
             </p>
           </div>
