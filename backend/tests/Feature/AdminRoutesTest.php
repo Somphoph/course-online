@@ -38,6 +38,7 @@ class AdminRoutesTest extends TestCase
             'price' => 1500,
             'slug' => 'admin-created-course',
             'is_published' => true,
+            'level' => 'Intermediate',
         ])
             ->assertCreated();
 
