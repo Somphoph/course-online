@@ -37,6 +37,18 @@ export default function EnrollPage({ params }) {
     if (fileRef.current) fileRef.current.files = dt.files;
   }, []);
 
+  const openFilePicker = useCallback(() => {
+    if (!submitting && !success) {
+      fileRef.current?.click();
+    }
+  }, [submitting, success]);
+
+  const clearSelectedFile = useCallback(() => {
+    setSelectedFile(null);
+    setPreview(null);
+    if (fileRef.current) fileRef.current.value = '';
+  }, []);
+
   // Redirect unauthenticated users
   useEffect(() => {
     if (!readAuthToken()) {
@@ -193,8 +205,9 @@ export default function EnrollPage({ params }) {
 
                 {/* Hidden native input */}
                 <input
+                  id="slip-image"
                   ref={fileRef}
-                  className="hidden"
+                  className="sr-only"
                   type="file"
                   accept="image/*"
                   required
@@ -204,15 +217,27 @@ export default function EnrollPage({ params }) {
 
                 {/* Drop zone */}
                 <div
-                  onClick={() => !submitting && !success && fileRef.current?.click()}
+                  role="button"
+                  tabIndex={submitting || success ? -1 : 0}
+                  aria-disabled={submitting || !!success}
+                  aria-describedby="slip-image-hint"
+                  onClick={openFilePicker}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      openFilePicker();
+                    }
+                  }}
                   onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                   onDragLeave={() => setDragOver(false)}
                   onDrop={(e) => {
                     e.preventDefault();
                     setDragOver(false);
-                    handleFileSelect(e.dataTransfer.files?.[0]);
+                    if (!submitting && !success) {
+                      handleFileSelect(e.dataTransfer.files?.[0]);
+                    }
                   }}
-                  className={`relative w-full rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer overflow-hidden
+                  className={`relative w-full rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer overflow-hidden focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/20
                     ${dragOver ? 'border-primary bg-primary/5 scale-[1.01]' : 'border-outline-variant bg-surface-container-low hover:border-primary/50 hover:bg-primary/3'}
                     ${submitting || success ? 'opacity-60 cursor-not-allowed' : ''}
                   `}
@@ -230,7 +255,7 @@ export default function EnrollPage({ params }) {
                       </div>
                       <button
                         type="button"
-                        onClick={(e) => { e.stopPropagation(); setSelectedFile(null); setPreview(null); if (fileRef.current) fileRef.current.value = ''; }}
+                        onClick={(e) => { e.stopPropagation(); clearSelectedFile(); }}
                         className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur transition-colors hover:bg-black/70"
                       >
                         <span className="material-symbols-outlined text-sm">close</span>
@@ -249,7 +274,7 @@ export default function EnrollPage({ params }) {
                           {dragOver ? 'วางไฟล์ที่นี่' : 'ลากวางหรือ '}
                           {!dragOver && <span className="text-primary underline underline-offset-2">คลิกเพื่อเลือกไฟล์</span>}
                         </p>
-                        <p className="mt-1 text-xs text-outline">JPG, PNG หรือ WEBP · ขนาดไม่เกิน 2 MB</p>
+                        <p id="slip-image-hint" className="mt-1 text-xs text-outline">JPG, PNG หรือ WEBP · ขนาดไม่เกิน 2 MB</p>
                       </div>
                     </div>
                   )}

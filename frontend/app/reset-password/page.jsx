@@ -127,7 +127,9 @@ function ResetPasswordContent() {
                           aria-label={showPassword ? 'Hide password' : 'Show password'}
                           onClick={() => setShowPassword((v) => !v)}
                         >
-                          {showPassword ? 'visibility_off' : 'visibility'}
+                          <span className="material-symbols-outlined text-[20px]">
+                            {showPassword ? 'visibility_off' : 'visibility'}
+                          </span>
                         </button>
                       </div>
                       <div className="bg-surface-container rounded-xl p-5 space-y-3 mt-3">
@@ -173,7 +175,9 @@ function ResetPasswordContent() {
                           aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
                           onClick={() => setShowConfirm((v) => !v)}
                         >
-                          {showConfirm ? 'visibility_off' : 'visibility'}
+                          <span className="material-symbols-outlined text-[20px]">
+                            {showConfirm ? 'visibility_off' : 'visibility'}
+                          </span>
                         </button>
                       </div>
                     </div>
