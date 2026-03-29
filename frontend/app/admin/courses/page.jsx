@@ -5,6 +5,16 @@ import { useEffect, useState } from 'react';
 import { apiFetch } from '../../_components/api';
 import AdminShell from '../admin-shell';
 
+function toSlug(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')   // remove non-ascii/non-word chars
+    .replace(/[\s_]+/g, '-')    // spaces/underscores → hyphens
+    .replace(/-+/g, '-')        // collapse multiple hyphens
+    .replace(/^-|-$/g, '');     // trim leading/trailing hyphens
+}
+
 const EMPTY_FORM = {
   title: '',
   description: '',
@@ -12,6 +22,7 @@ const EMPTY_FORM = {
   price: '',
   slug: '',
   is_published: false,
+  level: '',
 };
 
 const inputCls =
@@ -29,6 +40,7 @@ function CourseForm({ form, onChange, onSave, onCancel, saving, submitLabel }) {
         <div className="space-y-1">
           <label className={labelCls}>Slug</label>
           <input className={inputCls} name="slug" required value={form.slug} onChange={onChange} placeholder="course-slug" />
+          <p className="ml-1 text-[11px] text-outline">ใช้ตัวอักษร a-z, ตัวเลข และ - เท่านั้น เช่น excel-for-beginners</p>
         </div>
         <div className="space-y-1">
           <label className={labelCls}>Description</label>
@@ -52,6 +64,21 @@ function CourseForm({ form, onChange, onSave, onCancel, saving, submitLabel }) {
               </div>
             </button>
           </div>
+        </div>
+        <div className="space-y-1">
+          <label className={labelCls}>Level</label>
+          <select
+            className={inputCls}
+            name="level"
+            required
+            value={form.level}
+            onChange={onChange}
+          >
+            <option value="" disabled>Select a level</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
         </div>
         <div className="space-y-1">
           <label className={labelCls}>Thumbnail URL</label>
@@ -111,7 +138,14 @@ export default function AdminCoursesPage() {
 
   function handleChange(event) {
     const { name, value, type, checked } = event.target;
-    setForm((curr) => ({ ...curr, [name]: type === 'checkbox' ? checked : value }));
+    setForm((curr) => {
+      const updated = { ...curr, [name]: type === 'checkbox' ? checked : value };
+      // Auto-generate slug from title only when creating (editId is null) and slug hasn't been manually edited
+      if (name === 'title' && !editId && curr.slug === toSlug(curr.title)) {
+        updated.slug = toSlug(value);
+      }
+      return updated;
+    });
   }
 
   function openCreate() {
@@ -130,6 +164,7 @@ export default function AdminCoursesPage() {
       price: course.price ?? '',
       slug: course.slug ?? '',
       is_published: course.is_published ?? false,
+      level: course.level ?? '',
     });
     setError('');
     setPanelOpen(true);
@@ -152,6 +187,7 @@ export default function AdminCoursesPage() {
       price: Number(form.price),
       slug: form.slug,
       is_published: form.is_published,
+      level: form.level,
     };
     try {
       const res = editId
