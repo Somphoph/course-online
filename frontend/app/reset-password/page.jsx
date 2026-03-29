@@ -3,7 +3,6 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import styles from './page.module.css';
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -62,118 +61,146 @@ function ResetPasswordContent() {
   const reqSpecial = /[^a-zA-Z0-9]/.test(pw);
 
   return (
-    <main className={styles.shell}>
-      <div className={styles.card}>
-        {/* reset-password identifier preserved for smoke test */}
-        <h1 className={styles.heading}>Reset Password</h1>
-        <p className={styles.subheading}>
-          {email
-            ? `Resetting password for ${email}.`
-            : 'Please enter your new password below to regain access to your courses.'}
-        </p>
+    <main className="page-shell flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-md">
+        <div className="bg-surface-container p-1 rounded-[2rem]">
+          <div className="surface-panel rounded-[1.85rem] p-10 md:p-12">
+            <div className="mb-8 flex justify-center" aria-hidden="true">
+              <div className="w-12 h-1 bg-primary rounded-full" />
+            </div>
 
-        {success ? (
-          <p className={styles.success}>
-            Password updated. Redirecting to login…
-          </p>
-        ) : (
-          <>
-            {error ? <p className={styles.alert}>{error}</p> : null}
-            {!token ? (
-              <p className={styles.alert}>
-                Invalid reset link. Please request a new one from the{' '}
-                <Link href="/forgot-password" style={{ color: 'inherit' }}>
-                  forgot password page
-                </Link>
-                .
+            <header className="text-center mb-10">
+              <h1 className="section-title mb-4 text-4xl">
+                Reset Password
+              </h1>
+              <p className="section-copy">
+                {email
+                  ? `Resetting password for ${email}.`
+                  : 'Please enter your new password below to regain access to your courses.'}
+              </p>
+            </header>
+
+            {success ? (
+              <p className="status-banner-success text-center">
+                Password updated. Redirecting to login…
               </p>
             ) : (
-              <form
-                className={styles.form}
-                onSubmit={handleSubmit}
-                data-page="reset-password"
-              >
-                <div className={styles.field}>
-                  <label className={styles.label} htmlFor="rp-password">
-                    New Password
-                  </label>
-                  <div className={styles.inputWrapper}>
-                    <input
-                      id="rp-password"
-                      className={styles.input}
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      autoComplete="new-password"
-                      required
-                      minLength={8}
-                      value={form.password}
-                      onChange={handleChange}
-                    />
-                    <button
-                      type="button"
-                      className={styles.eyeButton}
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      onClick={() => setShowPassword((v) => !v)}
-                    >
-                      {showPassword ? 'visibility_off' : 'visibility'}
-                    </button>
-                  </div>
-                  {/* Password requirements checklist */}
-                  <ul className={styles.requirements}>
-                    <li className={`${styles.reqItem} ${req8chars ? styles.met : ''}`}>
-                      <span className={styles.reqDot} />
-                      At least 8 characters long
-                    </li>
-                    <li className={`${styles.reqItem} ${reqNumber ? styles.met : ''}`}>
-                      <span className={styles.reqDot} />
-                      Include at least one number
-                    </li>
-                    <li className={`${styles.reqItem} ${reqSpecial ? styles.met : ''}`}>
-                      <span className={styles.reqDot} />
-                      Include one special character
-                    </li>
-                  </ul>
-                </div>
+              <>
+                {error ? (
+                  <p className="status-banner-error mb-6">
+                    {error}
+                  </p>
+                ) : null}
+                {!token ? (
+                  <p className="status-banner-error mb-6">
+                    Invalid reset link. Please request a new one from the{' '}
+                    <Link href="/forgot-password" className="underline">
+                      forgot password page
+                    </Link>
+                    .
+                  </p>
+                ) : (
+                  <form
+                    className="space-y-6"
+                    onSubmit={handleSubmit}
+                    data-page="reset-password"
+                  >
+                    <div className="field-grid">
+                      <label className="field-label ml-1 block text-on-surface" htmlFor="rp-password">
+                        New Password
+                      </label>
+                      <div className="relative group">
+                        <input
+                          id="rp-password"
+                          className="field-input w-full bg-surface-container"
+                          type={showPassword ? 'text' : 'password'}
+                          name="password"
+                          autoComplete="new-password"
+                          required
+                          minLength={8}
+                          value={form.password}
+                          onChange={handleChange}
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors cursor-pointer bg-transparent border-0 p-0 font-body text-sm"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          onClick={() => setShowPassword((v) => !v)}
+                        >
+                          {showPassword ? 'visibility_off' : 'visibility'}
+                        </button>
+                      </div>
+                      <div className="bg-surface-container rounded-xl p-5 space-y-3 mt-3">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-body">
+                          Security Requirements
+                        </h3>
+                        <ul className="space-y-2">
+                          <li className={`flex items-center gap-3 text-sm font-medium font-body ${req8chars ? 'text-primary' : 'text-on-surface-variant'}`}>
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${req8chars ? 'bg-primary' : 'bg-outline-variant'}`} aria-hidden="true" />
+                            At least 8 characters long
+                          </li>
+                          <li className={`flex items-center gap-3 text-sm font-medium font-body ${reqNumber ? 'text-primary' : 'text-on-surface-variant'}`}>
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${reqNumber ? 'bg-primary' : 'bg-outline-variant'}`} aria-hidden="true" />
+                            Include at least one number
+                          </li>
+                          <li className={`flex items-center gap-3 text-sm font-medium font-body ${reqSpecial ? 'text-primary' : 'text-on-surface-variant'}`}>
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${reqSpecial ? 'bg-primary' : 'bg-outline-variant'}`} aria-hidden="true" />
+                            Include one special character
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
 
-                <div className={styles.field}>
-                  <label className={styles.label} htmlFor="rp-confirm">
-                    Confirm New Password
-                  </label>
-                  <div className={styles.inputWrapper}>
-                    <input
-                      id="rp-confirm"
-                      className={styles.input}
-                      type={showConfirm ? 'text' : 'password'}
-                      name="password_confirmation"
-                      autoComplete="new-password"
-                      required
-                      minLength={8}
-                      value={form.password_confirmation}
-                      onChange={handleChange}
-                    />
-                    <button
-                      type="button"
-                      className={styles.eyeButton}
-                      aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
-                      onClick={() => setShowConfirm((v) => !v)}
-                    >
-                      {showConfirm ? 'visibility_off' : 'visibility'}
-                    </button>
-                  </div>
-                </div>
+                    <div className="field-grid">
+                      <label className="field-label ml-1 block text-on-surface" htmlFor="rp-confirm">
+                        Confirm New Password
+                      </label>
+                      <div className="relative group">
+                        <input
+                          id="rp-confirm"
+                          className="field-input w-full bg-surface-container"
+                          type={showConfirm ? 'text' : 'password'}
+                          name="password_confirmation"
+                          autoComplete="new-password"
+                          required
+                          minLength={8}
+                          value={form.password_confirmation}
+                          onChange={handleChange}
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors cursor-pointer bg-transparent border-0 p-0 font-body text-sm"
+                          aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
+                          onClick={() => setShowConfirm((v) => !v)}
+                        >
+                          {showConfirm ? 'visibility_off' : 'visibility'}
+                        </button>
+                      </div>
+                    </div>
 
-                <button className={styles.submitButton} disabled={loading} type="submit">
-                  {loading ? 'Saving…' : 'Reset Password'}
-                </button>
-              </form>
+                    <button
+                      className="btn-primary w-full py-4 text-lg font-bold"
+                      type="submit"
+                      disabled={loading}
+                    >
+                      {loading ? 'Saving…' : 'Reset Password'}
+                    </button>
+                  </form>
+                )}
+              </>
             )}
-          </>
-        )}
 
-        <Link className={styles.backLink} href="/login">
-          <span className={styles.backArrow} aria-hidden="true">arrow_back</span>
-          Back to Login
-        </Link>
+            <div className="mt-8 text-center">
+              <Link
+                className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-primary no-underline hover:underline decoration-2 underline-offset-4 font-body"
+                href="/login"
+              >
+                <span aria-hidden="true" className="text-sm leading-none">&larr;</span>
+                Back to Login
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );

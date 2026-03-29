@@ -16,14 +16,16 @@ export async function runRouteSmokeTests() {
   assert.match(root, /courses\/\$\{course\.slug\}/);
 
   const login = await readAppFile('login/page.jsx');
-  assert.match(login, /Continue with Google/);
-  assert.match(login, /Continue with Facebook/);
+  assert.match(login, /socialLogin\('google'\)/);
+  assert.match(login, /socialLogin\('facebook'\)/);
+  assert.match(login, /Google/);
+  assert.match(login, /Facebook/);
   assert.match(login, /resolveDestinationForRole/);
   assert.match(login, /resolveLoginNotice/);
 
   const adminLogin = await readAppFile('admin/login/page.jsx');
-  assert.match(adminLogin, /Admin access/);
-  assert.match(adminLogin, /Password-only/);
+  assert.match(adminLogin, /Admin Access/);
+  assert.match(adminLogin, /Password Only/);
   assert.match(adminLogin, /resolveDestinationForRole/);
   assert.match(adminLogin, /isAdminRole/);
   assert.doesNotMatch(adminLogin, /Continue with Google/);
@@ -58,7 +60,7 @@ export async function runRouteSmokeTests() {
 
   const navbar = await readAppFile('_components/navbar.jsx');
   assert.match(navbar, /My Courses/);
-  assert.match(navbar, /Log in/);
+  assert.match(navbar, /Log In/);
   assert.match(navbar, /readAuthToken/);
   assert.match(navbar, /\/admin/);
 

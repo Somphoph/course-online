@@ -5,7 +5,7 @@ module.exports = {
     extend: {
       fontFamily: {
         headline: ['Manrope', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        body: ['Inter', 'Sarabun', 'sans-serif'],
       },
       colors: {
         // Primary
