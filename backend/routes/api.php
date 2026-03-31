@@ -14,8 +14,11 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\BundleController;
 use App\Http\Controllers\BundleEnrollmentController;
 use App\Http\Controllers\LessonVideoController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+Route::post('webhooks/paysolution', [WebhookController::class, 'handlePaySolution']);
 
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5,1');
@@ -44,7 +47,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('enrollments', [EnrollmentController::class, 'index']);
     Route::post('enrollments', [EnrollmentController::class, 'store']);
+    Route::get('enrollments/{enrollment}/payment-status', [EnrollmentController::class, 'paymentStatus']);
+    Route::post('enrollments/{enrollment}/promptpay/regenerate', [EnrollmentController::class, 'regeneratePromptPay']);
+    Route::post('enrollments/{enrollment}/promptpay/cancel', [EnrollmentController::class, 'cancelPromptPay']);
     Route::get('bundle-enrollments', [BundleEnrollmentController::class, 'index']);
+    Route::get('bundle-enrollments/{bundleEnrollment}/payment-status', [BundleEnrollmentController::class, 'paymentStatus']);
+    Route::post('bundle-enrollments/{bundleEnrollment}/promptpay/regenerate', [BundleEnrollmentController::class, 'regeneratePromptPay']);
+    Route::post('bundle-enrollments/{bundleEnrollment}/promptpay/cancel', [BundleEnrollmentController::class, 'cancelPromptPay']);
     Route::post('bundles/{bundle}/purchase', [BundleEnrollmentController::class, 'store']);
     Route::get('lessons/{lesson}/video-url', [LessonVideoController::class, 'show']);
 });

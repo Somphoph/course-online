@@ -54,9 +54,25 @@ export async function runRouteSmokeTests() {
 
   const enrollPage = await readAppFile('courses/[slug]/enroll/page.jsx');
   assert.match(enrollPage, /\/api\/enrollments/);
-  assert.match(enrollPage, /FormData/);
-  assert.match(enrollPage, /slip_image/);
+  assert.match(enrollPage, /PaymentCheckout/);
   assert.match(enrollPage, /readAuthToken/);
+
+  const bundleDetail = await readAppFile('bundles/[id]/page.jsx');
+  assert.match(bundleDetail, /\/api\/bundles\/\$\{id\}/);
+  assert.match(bundleDetail, /Buy this bundle/);
+  assert.match(bundleDetail, /Included courses/);
+
+  const bundlePurchase = await readAppFile('bundles/[id]/purchase/page.jsx');
+  assert.match(bundlePurchase, /PaymentCheckout/);
+  assert.match(bundlePurchase, /\/api\/bundle-enrollments\/\$\{/);
+  assert.match(bundlePurchase, /promptpay\/regenerate/);
+
+  const checkoutComponent = await readAppFile('_components/payment-checkout.jsx');
+  assert.match(checkoutComponent, /PromptPay via PaySolution/);
+  assert.match(checkoutComponent, /statusPath/);
+  assert.match(checkoutComponent, /FormData/);
+  assert.match(checkoutComponent, /Generate new QR/);
+  assert.match(checkoutComponent, /Back to payment methods/);
 
   const navbar = await readAppFile('_components/navbar.jsx');
   assert.match(navbar, /My Courses/);

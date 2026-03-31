@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rule;
 
 class StoreEnrollmentRequest extends FormRequest
@@ -20,7 +21,11 @@ class StoreEnrollmentRequest extends FormRequest
                 'integer',
                 Rule::exists('courses', 'id')->where(fn ($query) => $query->where('is_published', true)),
             ],
-            'slip_image' => ['required', 'image', 'max:2048'],
+            'payment_method' => ['nullable', Rule::in(['manual', 'promptpay'])],
+            'slip_image' => [
+                Rule::requiredIf($this->input('payment_method', 'manual') === 'manual'),
+                File::image()->max(2048),
+            ],
         ];
     }
 }

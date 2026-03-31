@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Arr;
 use RuntimeException;
 
 class PaySolutionService
@@ -19,16 +20,16 @@ class PaySolutionService
         $merchantId = config('paysolution.merchant_id');
         $apiKey     = config('paysolution.api_key');
         $secretKey  = config('paysolution.secret_key'); // reserved for request signing — verify with merchant docs
+        $endpoint   = config('paysolution.create_order_url');
 
-        if (! $merchantId || ! $apiKey || ! $secretKey) {
+        if (! $merchantId || ! $apiKey || ! $secretKey || ! $endpoint) {
             throw new RuntimeException('Pay Solution configuration is incomplete.');
         }
 
-        // TODO: Verify exact endpoint, headers, and body fields from merchant docs.
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '.$apiKey,
             'Content-Type'  => 'application/json',
-        ])->post('https://api.paysolutions.asia/v1/promptpay/order', [
+        ])->post($endpoint, [
             'merchantId'  => $merchantId,
             'amount'      => number_format($amount, 2, '.', ''),
             'orderId'     => $orderRef,
@@ -41,11 +42,14 @@ class PaySolutionService
 
         $data = $response->json();
 
-        // TODO: Confirm actual response field names from merchant docs.
         return [
-            'qr_image'   => $data['qrImage'] ?? $data['qr_image'] ?? '',
-            'expires_at' => $data['expiresAt'] ?? $data['expires_at'] ?? now()->addMinutes(15)->toISOString(),
-            'order_ref'  => $data['orderId'] ?? $data['order_id'] ?? $orderRef,
+            'qr_image'   => $this->firstMappedValue($data, config('paysolution.response_map.qr_image', []), ''),
+            'expires_at' => $this->firstMappedValue(
+                $data,
+                config('paysolution.response_map.expires_at', []),
+                now()->addMinutes(15)->toISOString()
+            ),
+            'order_ref'  => $this->firstMappedValue($data, config('paysolution.response_map.order_ref', []), $orderRef),
         ];
     }
 
@@ -66,5 +70,38 @@ class PaySolutionService
         $expected = hash_hmac('sha256', $payload, $secret);
 
         return hash_equals($expected, $signature);
+    }
+
+    public function signatureHeader(): string
+    {
+        return (string) config('paysolution.signature_header', 'X-PaySolution-Signature');
+    }
+
+    public function extractOrderRef(array $payload): ?string
+    {
+        return $this->firstMappedValue($payload, config('paysolution.order_ref_keys', []));
+    }
+
+    public function extractStatus(array $payload): string
+    {
+        return strtolower((string) $this->firstMappedValue($payload, config('paysolution.status_keys', []), ''));
+    }
+
+    public function isSuccessfulStatus(string $status): bool
+    {
+        return in_array(strtolower($status), config('paysolution.success_statuses', []), true);
+    }
+
+    private function firstMappedValue(array $payload, array $keys, mixed $default = null): mixed
+    {
+        foreach ($keys as $key) {
+            $value = Arr::get($payload, $key);
+
+            if ($value !== null && $value !== '') {
+                return $value;
+            }
+        }
+
+        return $default;
     }
 }
