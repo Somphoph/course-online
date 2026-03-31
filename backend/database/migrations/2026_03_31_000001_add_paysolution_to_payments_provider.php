@@ -56,6 +56,11 @@ return new class extends Migration
             // Drop temporary table
             DB::statement("DROP TABLE payments_new");
 
+            // Recreate indexes
+            DB::statement("CREATE INDEX IF NOT EXISTS payments_enrollment_id_index ON payments (enrollment_id)");
+            DB::statement("CREATE INDEX IF NOT EXISTS payments_user_id_index ON payments (user_id)");
+            DB::statement("CREATE INDEX IF NOT EXISTS payments_course_id_index ON payments (course_id)");
+
             DB::statement("PRAGMA foreign_keys=ON");
         }
     }
@@ -104,6 +109,11 @@ return new class extends Migration
             );
 
             DB::statement("DROP TABLE payments_new");
+
+            // Recreate indexes
+            DB::statement("CREATE INDEX IF NOT EXISTS payments_enrollment_id_index ON payments (enrollment_id)");
+            DB::statement("CREATE INDEX IF NOT EXISTS payments_user_id_index ON payments (user_id)");
+            DB::statement("CREATE INDEX IF NOT EXISTS payments_course_id_index ON payments (course_id)");
 
             DB::statement("PRAGMA foreign_keys=ON");
         }

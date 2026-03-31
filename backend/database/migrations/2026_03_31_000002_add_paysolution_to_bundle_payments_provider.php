@@ -55,6 +55,11 @@ return new class extends Migration
             // Drop temporary table
             DB::statement("DROP TABLE bundle_payments_new");
 
+            // Recreate indexes
+            DB::statement("CREATE INDEX IF NOT EXISTS bundle_payments_bundle_enrollment_id_index ON bundle_payments (bundle_enrollment_id)");
+            DB::statement("CREATE INDEX IF NOT EXISTS bundle_payments_user_id_index ON bundle_payments (user_id)");
+            DB::statement("CREATE INDEX IF NOT EXISTS bundle_payments_bundle_id_index ON bundle_payments (bundle_id)");
+
             DB::statement("PRAGMA foreign_keys=ON");
         }
     }
@@ -103,6 +108,11 @@ return new class extends Migration
             );
 
             DB::statement("DROP TABLE bundle_payments_new");
+
+            // Recreate indexes
+            DB::statement("CREATE INDEX IF NOT EXISTS bundle_payments_bundle_enrollment_id_index ON bundle_payments (bundle_enrollment_id)");
+            DB::statement("CREATE INDEX IF NOT EXISTS bundle_payments_user_id_index ON bundle_payments (user_id)");
+            DB::statement("CREATE INDEX IF NOT EXISTS bundle_payments_bundle_id_index ON bundle_payments (bundle_id)");
 
             DB::statement("PRAGMA foreign_keys=ON");
         }
