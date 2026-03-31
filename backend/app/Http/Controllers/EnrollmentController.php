@@ -36,14 +36,21 @@ class EnrollmentController extends Controller
         $paymentMethod = $data['payment_method'] ?? 'manual';
 
         $course = Course::query()->published()->findOrFail($data['course_id']);
+        $hasApprovedEnrollment = Enrollment::query()
+            ->where('user_id', $request->user()->id)
+            ->where('course_id', $course->id)
+            ->whereNull('bundle_enrollment_id')
+            ->where('status', 'approved')
+            ->exists();
         $existingEnrollment = Enrollment::query()
             ->where('user_id', $request->user()->id)
             ->where('course_id', $course->id)
             ->whereNull('bundle_enrollment_id')
+            ->where('status', '!=', 'approved')
             ->latest('id')
             ->first();
 
-        if ($existingEnrollment?->status === 'approved') {
+        if ($hasApprovedEnrollment) {
             return response()->json([
                 'message' => 'You are already enrolled in this course.',
             ], 422);

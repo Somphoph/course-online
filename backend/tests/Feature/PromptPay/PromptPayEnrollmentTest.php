@@ -308,6 +308,34 @@ class PromptPayEnrollmentTest extends TestCase
         $this->assertDatabaseCount('payments', 2);
     }
 
+    public function test_student_cannot_create_new_course_payment_when_any_direct_enrollment_is_approved(): void
+    {
+        Storage::fake('local');
+
+        $student = User::factory()->create();
+        $course = Course::factory()->create([
+            'is_published' => true,
+            'price' => 990,
+        ]);
+
+        Enrollment::create([
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'status' => 'approved',
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $this->post('/api/enrollments', [
+            'course_id' => $course->id,
+            'payment_method' => 'manual',
+            'slip_image' => UploadedFile::fake()->create('slip.jpg', 100, 'image/jpeg'),
+        ])->assertStatus(422)
+            ->assertJson([
+                'message' => 'You are already enrolled in this course.',
+            ]);
+    }
+
     public function test_bundle_promptpay_cancel_then_manual_submit_reuses_existing_bundle_enrollment(): void
     {
         Storage::fake('local');
