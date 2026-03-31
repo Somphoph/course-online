@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BundlePayment extends Model
 {
@@ -41,5 +42,10 @@ class BundlePayment extends Model
     public function bundle(): BelongsTo
     {
         return $this->belongsTo(Bundle::class);
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(PaymentEvent::class);
     }
 }

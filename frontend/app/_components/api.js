@@ -14,3 +14,13 @@ export async function apiFetch(path, options = {}) {
 
   return fetch(path, { ...options, headers });
 }
+
+export function buildJsonRequest(body) {
+  return {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  };
+}
