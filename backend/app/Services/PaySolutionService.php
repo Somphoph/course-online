@@ -19,10 +19,9 @@ class PaySolutionService
     {
         $merchantId = config('paysolution.merchant_id');
         $apiKey     = config('paysolution.api_key');
-        $secretKey  = config('paysolution.secret_key'); // reserved for request signing — verify with merchant docs
         $endpoint   = config('paysolution.create_order_url');
 
-        if (! $merchantId || ! $apiKey || ! $secretKey || ! $endpoint) {
+        if (! $merchantId || ! $apiKey || ! $endpoint) {
             throw new RuntimeException('Pay Solution configuration is incomplete.');
         }
 

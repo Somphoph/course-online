@@ -8,12 +8,12 @@ use Tests\TestCase;
 
 class PaySolutionServiceTest extends TestCase
 {
-    public function test_create_order_uses_configured_endpoint_and_normalizes_response(): void
+    public function test_create_order_uses_configured_endpoint_and_normalizes_response_without_secret_key(): void
     {
         config([
             'paysolution.merchant_id' => 'merchant-1',
             'paysolution.api_key' => 'api-key',
-            'paysolution.secret_key' => 'secret-key',
+            'paysolution.secret_key' => null,
             'paysolution.create_order_url' => 'https://merchant.example/promptpay',
             'paysolution.response_map' => [
                 'qr_image' => ['data.qrCodeImage', 'qrImage'],

@@ -38,6 +38,12 @@ class BundleEnrollmentController extends Controller
 
         $bundle->load('courses');
         $paymentMethod = $request->validated()['payment_method'] ?? 'manual';
+        $existingBundleEnrollment = BundleEnrollment::query()
+            ->where('user_id', $request->user()->id)
+            ->where('bundle_id', $bundle->id)
+            ->where('status', '!=', 'approved')
+            ->latest('id')
+            ->first();
 
         $alreadyEnrolledCourses = Course::query()
             ->whereIn('id', $bundle->courses->pluck('id'))
@@ -48,18 +54,25 @@ class BundleEnrollmentController extends Controller
             ->get();
 
         if ($paymentMethod === 'promptpay') {
-            return $this->storePromptPayBundlePurchase($request, $bundle, $alreadyEnrolledCourses);
+            return $this->storePromptPayBundlePurchase(
+                $request,
+                $bundle,
+                $alreadyEnrolledCourses,
+                $existingBundleEnrollment
+            );
         }
 
-        $bundleEnrollment = DB::transaction(function () use ($request, $bundle): BundleEnrollment {
+        $bundleEnrollment = DB::transaction(function () use ($request, $bundle, $existingBundleEnrollment): BundleEnrollment {
             $slipPath = $request->file('slip_image')->store('slips', 'local');
 
-            $bundleEnrollment = BundleEnrollment::create([
-                'user_id' => $request->user()->id,
-                'bundle_id' => $bundle->id,
-                'status' => 'pending',
-                'slip_image_path' => $slipPath,
-            ]);
+            $bundleEnrollment = $this->resolveBundleEnrollment(
+                $request->user()->id,
+                $bundle->id,
+                $existingBundleEnrollment,
+                $slipPath
+            );
+
+            $this->failPendingBundlePayments($bundleEnrollment);
 
             BundlePayment::create([
                 'bundle_enrollment_id' => $bundleEnrollment->id,
@@ -152,14 +165,18 @@ class BundleEnrollmentController extends Controller
     private function storePromptPayBundlePurchase(
         PurchaseBundleRequest $request,
         Bundle $bundle,
-        $alreadyEnrolledCourses
+        $alreadyEnrolledCourses,
+        ?BundleEnrollment $existingBundleEnrollment
     ): JsonResponse {
-        $payload = DB::transaction(function () use ($request, $bundle, $alreadyEnrolledCourses): array {
-            $bundleEnrollment = BundleEnrollment::create([
-                'user_id' => $request->user()->id,
-                'bundle_id' => $bundle->id,
-                'status' => 'pending',
-            ]);
+        $payload = DB::transaction(function () use ($request, $bundle, $alreadyEnrolledCourses, $existingBundleEnrollment): array {
+            $bundleEnrollment = $this->resolveBundleEnrollment(
+                $request->user()->id,
+                $bundle->id,
+                $existingBundleEnrollment,
+                null
+            );
+
+            $this->failPendingBundlePayments($bundleEnrollment);
 
             return $this->createPromptPayPayload(
                 $request->user()->id,
@@ -248,5 +265,50 @@ class BundleEnrollmentController extends Controller
             ->first();
 
         return data_get($event?->payload, 'expires_at');
+    }
+
+    private function resolveBundleEnrollment(
+        int $userId,
+        int $bundleId,
+        ?BundleEnrollment $existingBundleEnrollment,
+        ?string $slipPath
+    ): BundleEnrollment {
+        if ($existingBundleEnrollment) {
+            $existingBundleEnrollment->update([
+                'status' => 'pending',
+                'slip_image_path' => $slipPath,
+                'approved_at' => null,
+                'approved_by' => null,
+            ]);
+
+            return $existingBundleEnrollment->fresh();
+        }
+
+        return BundleEnrollment::create([
+            'user_id' => $userId,
+            'bundle_id' => $bundleId,
+            'status' => 'pending',
+            'slip_image_path' => $slipPath,
+        ]);
+    }
+
+    private function failPendingBundlePayments(BundleEnrollment $bundleEnrollment): void
+    {
+        $pendingPayments = BundlePayment::query()
+            ->where('bundle_enrollment_id', $bundleEnrollment->id)
+            ->where('status', 'pending')
+            ->get();
+
+        foreach ($pendingPayments as $payment) {
+            $payment->update(['status' => 'failed']);
+
+            if ($payment->provider === 'paysolution') {
+                PaymentEvent::create([
+                    'bundle_payment_id' => $payment->id,
+                    'event_type' => 'failed',
+                    'payload' => ['action' => 'switch_method'],
+                ]);
+            }
+        }
     }
 }

@@ -11,6 +11,8 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Services\PaySolutionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -202,5 +204,203 @@ class PromptPayEnrollmentTest extends TestCase
             'bundle_payment_id' => $bundlePayment->id,
             'event_type' => 'expired',
         ]);
+    }
+
+    public function test_course_promptpay_cancel_then_manual_submit_reuses_existing_enrollment(): void
+    {
+        Storage::fake('local');
+
+        $student = User::factory()->create();
+        $course = Course::factory()->create([
+            'is_published' => true,
+            'price' => 990,
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $this->mock(PaySolutionService::class, function ($mock): void {
+            $mock->shouldReceive('createOrder')
+                ->once()
+                ->andReturn([
+                    'qr_image' => 'data:image/png;base64,EEE',
+                    'expires_at' => '2026-03-31T11:00:00Z',
+                    'order_ref' => 'ORDER-COURSE-003',
+                ]);
+        });
+
+        $promptPayResponse = $this->postJson('/api/enrollments', [
+            'course_id' => $course->id,
+            'payment_method' => 'promptpay',
+        ])->assertCreated();
+
+        $enrollmentId = $promptPayResponse->json('entity_id');
+
+        $this->postJson("/api/enrollments/{$enrollmentId}/promptpay/cancel")
+            ->assertOk();
+
+        $this->post('/api/enrollments', [
+            'course_id' => $course->id,
+            'payment_method' => 'manual',
+            'slip_image' => UploadedFile::fake()->create('slip.jpg', 100, 'image/jpeg'),
+        ])->assertStatus(201);
+
+        $this->assertDatabaseCount('enrollments', 1);
+        $this->assertDatabaseHas('enrollments', [
+            'id' => $enrollmentId,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'status' => 'pending',
+        ]);
+        $this->assertDatabaseCount('payments', 2);
+        $this->assertDatabaseHas('payments', [
+            'enrollment_id' => $enrollmentId,
+            'provider' => 'manual',
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_course_promptpay_cancel_then_new_promptpay_reuses_existing_enrollment(): void
+    {
+        $student = User::factory()->create();
+        $course = Course::factory()->create([
+            'is_published' => true,
+            'price' => 990,
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $this->mock(PaySolutionService::class, function ($mock): void {
+            $mock->shouldReceive('createOrder')
+                ->twice()
+                ->andReturn(
+                    [
+                        'qr_image' => 'data:image/png;base64,FFF',
+                        'expires_at' => '2026-03-31T11:10:00Z',
+                        'order_ref' => 'ORDER-COURSE-004',
+                    ],
+                    [
+                        'qr_image' => 'data:image/png;base64,GGG',
+                        'expires_at' => '2026-03-31T11:20:00Z',
+                        'order_ref' => 'ORDER-COURSE-005',
+                    ]
+                );
+        });
+
+        $firstResponse = $this->postJson('/api/enrollments', [
+            'course_id' => $course->id,
+            'payment_method' => 'promptpay',
+        ])->assertCreated();
+
+        $enrollmentId = $firstResponse->json('entity_id');
+
+        $this->postJson("/api/enrollments/{$enrollmentId}/promptpay/cancel")
+            ->assertOk();
+
+        $secondResponse = $this->postJson('/api/enrollments', [
+            'course_id' => $course->id,
+            'payment_method' => 'promptpay',
+        ])->assertCreated();
+
+        $secondResponse->assertJsonPath('entity_id', $enrollmentId)
+            ->assertJsonPath('order_ref', 'ORDER-COURSE-005');
+
+        $this->assertDatabaseCount('enrollments', 1);
+        $this->assertDatabaseCount('payments', 2);
+    }
+
+    public function test_bundle_promptpay_cancel_then_manual_submit_reuses_existing_bundle_enrollment(): void
+    {
+        Storage::fake('local');
+
+        $student = User::factory()->create();
+        $bundle = Bundle::factory()->published()->create([
+            'price' => 1800,
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $this->mock(PaySolutionService::class, function ($mock): void {
+            $mock->shouldReceive('createOrder')
+                ->once()
+                ->andReturn([
+                    'qr_image' => 'data:image/png;base64,HHH',
+                    'expires_at' => '2026-03-31T11:30:00Z',
+                    'order_ref' => 'ORDER-BUNDLE-003',
+                ]);
+        });
+
+        $promptPayResponse = $this->postJson("/api/bundles/{$bundle->id}/purchase", [
+            'payment_method' => 'promptpay',
+        ])->assertCreated();
+
+        $bundleEnrollmentId = $promptPayResponse->json('entity_id');
+
+        $this->postJson("/api/bundle-enrollments/{$bundleEnrollmentId}/promptpay/cancel")
+            ->assertOk();
+
+        $this->post("/api/bundles/{$bundle->id}/purchase", [
+            'payment_method' => 'manual',
+            'slip_image' => UploadedFile::fake()->create('bundle-slip.jpg', 100, 'image/jpeg'),
+        ])->assertStatus(201);
+
+        $this->assertDatabaseCount('bundle_enrollments', 1);
+        $this->assertDatabaseHas('bundle_enrollments', [
+            'id' => $bundleEnrollmentId,
+            'user_id' => $student->id,
+            'bundle_id' => $bundle->id,
+            'status' => 'pending',
+        ]);
+        $this->assertDatabaseCount('bundle_payments', 2);
+        $this->assertDatabaseHas('bundle_payments', [
+            'bundle_enrollment_id' => $bundleEnrollmentId,
+            'provider' => 'manual',
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_bundle_promptpay_cancel_then_new_promptpay_reuses_existing_bundle_enrollment(): void
+    {
+        $student = User::factory()->create();
+        $bundle = Bundle::factory()->published()->create([
+            'price' => 1800,
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $this->mock(PaySolutionService::class, function ($mock): void {
+            $mock->shouldReceive('createOrder')
+                ->twice()
+                ->andReturn(
+                    [
+                        'qr_image' => 'data:image/png;base64,III',
+                        'expires_at' => '2026-03-31T11:40:00Z',
+                        'order_ref' => 'ORDER-BUNDLE-004',
+                    ],
+                    [
+                        'qr_image' => 'data:image/png;base64,JJJ',
+                        'expires_at' => '2026-03-31T11:50:00Z',
+                        'order_ref' => 'ORDER-BUNDLE-005',
+                    ]
+                );
+        });
+
+        $firstResponse = $this->postJson("/api/bundles/{$bundle->id}/purchase", [
+            'payment_method' => 'promptpay',
+        ])->assertCreated();
+
+        $bundleEnrollmentId = $firstResponse->json('entity_id');
+
+        $this->postJson("/api/bundle-enrollments/{$bundleEnrollmentId}/promptpay/cancel")
+            ->assertOk();
+
+        $secondResponse = $this->postJson("/api/bundles/{$bundle->id}/purchase", [
+            'payment_method' => 'promptpay',
+        ])->assertCreated();
+
+        $secondResponse->assertJsonPath('entity_id', $bundleEnrollmentId)
+            ->assertJsonPath('order_ref', 'ORDER-BUNDLE-005');
+
+        $this->assertDatabaseCount('bundle_enrollments', 1);
+        $this->assertDatabaseCount('bundle_payments', 2);
     }
 }
