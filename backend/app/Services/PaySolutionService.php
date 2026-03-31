@@ -11,13 +11,14 @@ class PaySolutionService
      * Create a PromptPay QR order with Pay Solution.
      *
      * @return array{qr_image: string, expires_at: string, order_ref: string}
-     * @throws RuntimeException when the API call fails
+     * @throws RuntimeException when config is incomplete or API returns non-2xx
+     * @throws \Illuminate\Http\Client\ConnectionException on network/transport failure
      */
     public function createOrder(float $amount, string $orderRef, string $callbackUrl): array
     {
         $merchantId = config('paysolution.merchant_id');
         $apiKey     = config('paysolution.api_key');
-        $secretKey  = config('paysolution.secret_key');
+        $secretKey  = config('paysolution.secret_key'); // reserved for request signing — verify with merchant docs
 
         if (! $merchantId || ! $apiKey || ! $secretKey) {
             throw new RuntimeException('Pay Solution configuration is incomplete.');
