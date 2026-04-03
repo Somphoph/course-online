@@ -5,19 +5,27 @@ import { useEffect, useState } from 'react';
 
 export default function HomePage() {
   const [courses, setCourses] = useState([]);
+  const [bundles, setBundles] = useState([]);
   const [loading, setLoading] = useState(true);
   const featuredCourse = courses[0];
   const supportingCourses = courses.slice(1);
 
   useEffect(() => {
-    fetch('/api/courses', { headers: { Accept: 'application/json' } })
-      .then((res) => res.json())
-      .then((payload) => {
-        const data = payload.data ?? payload;
-        setCourses(Array.isArray(data) ? data : []);
+    Promise.all([
+      fetch('/api/courses', { headers: { Accept: 'application/json' } }),
+      fetch('/api/bundles', { headers: { Accept: 'application/json' } }),
+    ])
+      .then(async ([coursesRes, bundlesRes]) => {
+        const coursesPayload = coursesRes.ok ? await coursesRes.json() : [];
+        const bundlesPayload = bundlesRes.ok ? await bundlesRes.json() : [];
+        const courseData = coursesPayload.data ?? coursesPayload;
+        const bundleData = bundlesPayload.data ?? bundlesPayload;
+        setCourses(Array.isArray(courseData) ? courseData : []);
+        setBundles(Array.isArray(bundleData) ? bundleData : []);
       })
       .catch(() => {
         setCourses([]);
+        setBundles([]);
       })
       .finally(() => {
         setLoading(false);
@@ -229,6 +237,89 @@ export default function HomePage() {
           </div>
         ) : null}
       </section>
+
+      {/* Bundle Section */}
+      {!loading && bundles.length > 0 && (
+        <section id="bundles" className="mt-12 grid gap-5">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <p className="m-0 mb-1 text-[0.75rem] tracking-widest uppercase text-on-surface/46">
+                Special offers
+              </p>
+              <h2 className="m-0 font-headline text-2xl lg:text-[2.2rem] font-bold leading-tight tracking-tight text-on-surface">
+                Course bundles
+              </h2>
+            </div>
+            <Link
+              href="/bundles"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+            >
+              View all bundles →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {bundles.slice(0, 3).map((bundle) => {
+              const courseCount = bundle.courses?.length ?? 0;
+              return (
+                <Link
+                  key={bundle.id}
+                  href={`/bundles/${bundle.id}`}
+                  className="group flex flex-col bg-white rounded-2xl overflow-hidden no-underline text-inherit transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+                  style={{ boxShadow: '0 12px 32px rgba(25,28,34,0.06)' }}
+                >
+                  {bundle.thumbnail ? (
+                    <img
+                      className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500"
+                      src={bundle.thumbnail}
+                      alt={bundle.title}
+                    />
+                  ) : (
+                    <div
+                      className="w-full aspect-video"
+                      style={{
+                        background:
+                          'linear-gradient(180deg,rgba(0,106,220,0.1),rgba(16,185,129,0.06)),rgba(255,255,255,0.6)',
+                      }}
+                      role="presentation"
+                    />
+                  )}
+
+                  <div className="flex flex-col flex-1 gap-2 p-5">
+                    <p className="m-0 text-[0.72rem] tracking-widest uppercase text-on-surface/44">
+                      Bundle
+                    </p>
+                    <p className="m-0 font-headline font-bold text-[1.05rem] text-on-surface group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                      {bundle.title}
+                    </p>
+                    {bundle.description && (
+                      <p className="m-0 text-[0.92rem] leading-snug text-on-surface/68 flex-1 line-clamp-3">
+                        {bundle.description}
+                      </p>
+                    )}
+
+                    <div className="mt-2 flex items-baseline justify-between gap-3">
+                      <span className="font-bold text-primary-container">
+                        {Number(bundle.price).toLocaleString('th-TH')} THB
+                      </span>
+                      {bundle.savings > 0 && (
+                        <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                          Save {Number(bundle.savings).toLocaleString('th-TH')} THB
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1.5 text-xs text-on-surface-variant pt-1 border-t border-outline-variant/20">
+                      <span className="material-symbols-outlined text-sm">menu_book</span>
+                      {courseCount} {courseCount === 1 ? 'course' : 'courses'} included
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
     </div>
   );
