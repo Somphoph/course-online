@@ -24,47 +24,63 @@ const STATUS_CLASSES = {
 export default function DashboardPage() {
   const router = useRouter();
   const [enrollments, setEnrollments] = useState([]);
+  const [bundleEnrollments, setBundleEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const token = readAuthToken();
+    let cancelled = false;
 
     if (!token) {
       router.replace('/login?error=session_expired');
       return;
     }
 
-    apiFetch('/api/enrollments')
-      .then((res) => {
-        if (res.status === 401) {
+    Promise.all([
+      apiFetch('/api/enrollments'),
+      apiFetch('/api/bundle-enrollments'),
+    ])
+      .then(async ([enrollmentsRes, bundleEnrollmentsRes]) => {
+        if (enrollmentsRes.status === 401 || bundleEnrollmentsRes.status === 401) {
           clearAuthToken();
           router.replace('/login?error=session_expired');
           return null;
         }
 
-        if (!res.ok) {
+        if (!enrollmentsRes.ok) {
           throw new Error('Unable to load enrollments.');
         }
 
-        return res.json();
-      })
-      .then((payload) => {
-        if (payload) {
+        const enrollmentsPayload = await enrollmentsRes.json();
+        const bundleEnrollmentsPayload = bundleEnrollmentsRes.ok
+          ? await bundleEnrollmentsRes.json()
+          : { data: [] };
+
+        if (!cancelled) {
           setError('');
-          setEnrollments(payload.data ?? payload);
+          setEnrollments(enrollmentsPayload.data ?? enrollmentsPayload);
+          setBundleEnrollments(bundleEnrollmentsPayload.data ?? bundleEnrollmentsPayload);
         }
       })
       .catch(() => {
-        setError('Unable to load enrolments right now. Please try again.');
+        if (!cancelled) {
+          setError('Unable to load enrolments right now. Please try again.');
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       });
+
+    return () => { cancelled = true; };
   }, [router]);
 
   const approved = enrollments.filter((e) => e.status === 'approved').length;
   const pending = enrollments.filter((e) => e.status === 'pending').length;
+  const bundleApproved = bundleEnrollments.filter((e) => e.status === 'approved').length;
+  const bundlePending = bundleEnrollments.filter((e) => e.status === 'pending').length;
 
   return (
     <main className="page-shell mx-auto max-w-5xl space-y-8 px-4 py-10 md:px-8">
@@ -194,6 +210,62 @@ export default function DashboardPage() {
           </div>
         )}
       </section>
+
+      {/* Bundle Enrollments Section */}
+      {bundleEnrollments.length > 0 && (
+        <section className="surface-card p-8">
+          <div className="mb-6">
+            <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">
+              Bundles
+            </p>
+            <h2 className="text-2xl font-headline font-bold text-on-surface">Your bundles</h2>
+          </div>
+
+          <div className="divide-y divide-slate-100">
+            {bundleEnrollments.map((bundleEnrollment) => (
+              <div
+                key={bundleEnrollment.id}
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-5"
+              >
+                <div className="space-y-1">
+                  <p className="font-bold text-on-surface">
+                    {bundleEnrollment.bundle?.title ?? '—'}
+                  </p>
+                  <p className="text-xs text-on-surface-variant">
+                    Submitted {new Date(bundleEnrollment.created_at).toLocaleDateString('th-TH')}
+                  </p>
+                  {bundleEnrollment.status === 'approved' && bundleEnrollment.bundle?.courses?.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {bundleEnrollment.bundle.courses.map((course) => (
+                        <Link
+                          key={course.id}
+                          href={`/learn/${course.slug}`}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                        >
+                          {course.title} →
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-on-surface-variant">
+                    {bundleEnrollment.bundle?.courses?.length ?? 0} courses
+                  </span>
+                  <span
+                    className={
+                      STATUS_CLASSES[bundleEnrollment.status] ??
+                      'inline-block px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap bg-amber-50 text-amber-700'
+                    }
+                  >
+                    {STATUS_LABELS[bundleEnrollment.status] ?? bundleEnrollment.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
