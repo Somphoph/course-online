@@ -16,6 +16,14 @@ class BundleEnrollmentResource extends JsonResource
             'created_at' => $this->created_at,
             'bundle' => $this->whenLoaded('bundle', fn () => new BundleResource($this->bundle)),
             'user' => $this->whenLoaded('user', fn () => new UserResource($this->user)),
+            'payment' => $this->whenLoaded('payment', fn () => [
+                'id' => $this->payment->id,
+                'amount' => $this->payment->amount,
+                'currency' => $this->payment->currency,
+                'provider' => $this->payment->provider,
+                'provider_ref' => $this->payment->provider_ref,
+                'status' => $this->payment->status,
+            ]),
         ];
     }
 }
