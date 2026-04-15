@@ -8,6 +8,8 @@ import AdminAccessGate from './admin-access-gate';
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: 'dashboard' },
   { href: '/admin/courses', label: 'Courses', icon: 'menu_book' },
+  { href: '/admin/bundles', label: 'Bundles', icon: 'package_2' },
+  { href: '/admin/bundle-enrollments', label: 'Bundle Enrollments', icon: 'shopping_cart' },
   { href: '/admin/students', label: 'Students', icon: 'group' },
 ];
 
